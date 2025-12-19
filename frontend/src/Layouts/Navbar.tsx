@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { SlashIcon } from "lucide-react"
 
@@ -24,14 +26,8 @@ export function BreadcrumbWithCustomSeparator() {
         </BreadcrumbSeparator>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/components">Components</Link>
+            <Link href="/going">Going</Link>
           </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator>
-          <SlashIcon />
-        </BreadcrumbSeparator>
-        <BreadcrumbItem>
-          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
