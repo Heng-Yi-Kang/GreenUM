@@ -1,47 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { Plus, Calendar, Filter } from 'lucide-react';
 import EventCard from '../components/EventCard';
 import AddEventModal from '../components/AddEventModal';
 
 const EventsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: 'Community Tree Planting',
-      date: '2024-03-15',
-      time: '09:00',
-      location: 'Riverside Park',
-      description: 'Join us for a day of planting native trees to restore the local ecosystem. Gloves and tools provided.',
-    },
-    {
-      id: 2,
-      title: 'Sustainability Workshop',
-      date: '2024-03-20',
-      time: '14:00',
-      location: 'Community Center',
-      description: 'Learn practical tips for sustainable living, from composting to reducing plastic waste.',
-    },
-    {
-      id: 3,
-      title: 'Beach Cleanup Drive',
-      date: '2024-03-22',
-      time: '08:00',
-      location: 'North Beach',
-      description: 'Help us keep our ocean clean! We will be collecting trash along the coastline. Refreshments provided.',
-    },
-    {
-      id: 4,
-      title: 'Green Energy Fair',
-      date: '2024-04-05',
-      time: '10:00',
-      location: 'City Square',
-      description: 'Explore renewable energy solutions for your home and meet local providers.',
-    }
-  ]);
+  const [events, setEvents] = useState<any[]>([]);
+  const { isAdmin } = useAuth(); // Use Auth Context
+
+  // Fetch events from backend
+  useEffect(() => {
+    fetch('http://localhost:5000/api/events')
+      .then(res => res.json())
+      .then(data => setEvents(data))
+      .catch(err => console.error('Error fetching events:', err));
+  }, []);
 
   const handleAddEvent = (newEvent: any) => {
-    setEvents([...events, { ...newEvent, id: events.length + 1 }]);
+    // Optimistic update or refetch
+    fetch('http://localhost:5000/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newEvent)
+    })
+      .then(res => res.json())
+      .then(savedEvent => {
+        setEvents([...events, savedEvent]);
+      })
+      .catch(err => console.error('Error adding event:', err));
   };
 
   return (
@@ -58,13 +45,17 @@ const EventsPage = () => {
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </button>
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 hover:shadow-lg hover:shadow-green-600/20 transition-all"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Event
-          </button>
+          
+          {/* Only show Add Event if admin */}
+          {isAdmin && (
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 hover:shadow-lg hover:shadow-green-600/20 transition-all"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Event
+            </button>
+          )}
         </div>
       </div>
 
@@ -99,19 +90,28 @@ const EventsPage = () => {
 
       {/* Events Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.map((event) => (
-          <EventCard
-            key={event.id}
-            {...event}
-          />
-        ))}
+        {events.length === 0 ? (
+           <div className="col-span-full text-center py-10 text-gray-500">
+             No events found. {isAdmin ? 'Add the first one!' : 'Check back later.'}
+           </div>
+        ) : (
+          events.map((event) => (
+            <EventCard
+              key={event.id}
+              {...event}
+            />
+          ))
+        )}
       </div>
 
-      <AddEventModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAdd={handleAddEvent}
-      />
+      {/* Modal only accessible if admin (extra safety) */}
+      {isAdmin && (
+        <AddEventModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onAdd={handleAddEvent}
+        />
+      )}
     </div>
   );
 };
