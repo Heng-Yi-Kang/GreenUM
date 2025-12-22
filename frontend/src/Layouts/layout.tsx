@@ -2,6 +2,7 @@ import { type FC, type PropsWithChildren } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { User, LogOut, LogIn as LogInIcon } from 'lucide-react';
+import { BreadcrumbWithCustomSeparator } from "./Navbar";
 
 const Layout: FC<PropsWithChildren> = ({ children }) => {
   const { user, signOut, isAdmin } = useAuth();
@@ -10,12 +11,15 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
       
       <div className="bg-white"> 
         
+        
         <header className="fixed top-0 left-0 right-0 z-10 
                            border-b border-gray-200 bg-white shadow-sm 
                            py-4 px-4 sm:px-6 lg:px-8">
-          
+         
+
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            
+          <BreadcrumbWithCustomSeparator />
+             
             <div className="flex items-center gap-4">
               {user ? (
                 <div className="flex items-center gap-3">
