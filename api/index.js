@@ -37,6 +37,8 @@ app.get('/api/events', async (req, res) => {
     if (error) throw error;
     res.json(data);
   } catch (err) {
+    console.error('Error fetching events:', err);
+    res.status(500).json({ error: 'An error occurred while fetching events.' });
     res.status(500).json({ error: err.message });
   }
 });
