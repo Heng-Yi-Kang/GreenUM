@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
-interface AddEventModalProps {
+interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (event: any) => void;
+  onSubmit: (event: any) => void;
+  initialData?: any | null;
+  title?: string;
 }
 
-const AddEventModal: React.FC<AddEventModalProps> = ({ isOpen, onClose, onAdd }) => {
+const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onSubmit, initialData, title }) => {
   const [formData, setFormData] = useState({
     title: '',
     date: '',
@@ -16,17 +18,30 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ isOpen, onClose, onAdd })
     description: ''
   });
 
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        title: initialData.title || '',
+        date: initialData.date || '',
+        time: initialData.time || '',
+        location: initialData.location || '',
+        description: initialData.description || ''
+      });
+    } else {
+      setFormData({ title: '', date: '', time: '', location: '', description: '' });
+    }
+  }, [initialData, isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAdd(formData);
-    setFormData({ title: '', date: '', time: '', location: '', description: '' });
+    onSubmit(formData);
     onClose();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target as any;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -34,7 +49,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ isOpen, onClose, onAdd })
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="flex justify-between items-center p-6 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900">Add New Event</h2>
+          <h2 className="text-xl font-bold text-gray-900">{title || (initialData ? 'Edit Event' : 'Add New Event')}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X className="w-5 h-5" />
           </button>
@@ -110,7 +125,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ isOpen, onClose, onAdd })
               type="submit"
               className="w-full py-2.5 px-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 focus:ring-4 focus:ring-green-100 transition-all shadow-lg shadow-green-600/20"
             >
-              Create Event
+              {initialData ? 'Save Changes' : 'Create Event'}
             </button>
           </div>
         </form>
@@ -119,4 +134,4 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ isOpen, onClose, onAdd })
   );
 };
 
-export default AddEventModal;
+export default EventModal;

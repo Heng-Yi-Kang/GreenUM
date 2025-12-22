@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 // For CSS Modules (if used)
 declare module '*.module.css' {
     const classes: { [key: string]: string };

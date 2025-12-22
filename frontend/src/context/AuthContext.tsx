@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import type { User } from '@supabase/supabase-js';
+import type { User, SignInWithPasswordCredentials, SignUpWithPasswordCredentials } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
   isAdmin: boolean;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signIn: (credentials: SignInWithPasswordCredentials) => Promise<{ error: any }>;
+  signUp: (credentials: SignUpWithPasswordCredentials) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -14,7 +15,8 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isAdmin: false,
   loading: true,
-  signInWithGoogle: async () => {},
+  signIn: async () => ({ error: null }),
+  signUp: async () => ({ error: null }),
   signOut: async () => {},
 });
 
@@ -24,23 +26,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabase.auth) return;
+
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      checkAdmin(session?.user);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      checkAdmin(currentUser);
+      setLoading(false);
+    }).catch(() => {
       setLoading(false);
     });
 
-    // Listen for changes on auth state (logged in, signed out, etc.)
+    // Listen for changes on auth state
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      checkAdmin(session?.user);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      checkAdmin(currentUser);
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => subscription?.unsubscribe();
   }, []);
 
   const checkAdmin = (user: User | null | undefined) => {
@@ -48,18 +56,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAdmin(false);
       return;
     }
-    // REAL WORLD: You would check a 'roles' table or `user_metadata`
-    // FOR DEMO: We will assume any user with an email ending in @greenum.org is an admin
-    // OR we can just hardcode a specific email for testing.
-    // Let's use metadata for flexibility if set, otherwise fallback to specific domain.
     const isGreenumAdmin = user.email?.endsWith('@greenum.org') || user.user_metadata?.role === 'admin';
     setIsAdmin(!!isGreenumAdmin);
   };
 
-  const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    });
+  const signIn = async (credentials: SignInWithPasswordCredentials) => {
+    const { error } = await supabase.auth.signInWithPassword(credentials);
+    return { error };
+  };
+
+  const signUp = async (credentials: SignUpWithPasswordCredentials) => {
+    const { error } = await supabase.auth.signUp(credentials);
+    return { error };
   };
 
   const signOut = async () => {
@@ -67,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, loading, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, isAdmin, loading, signIn, signUp, signOut }}>
       {!loading && children}
     </AuthContext.Provider>
   );

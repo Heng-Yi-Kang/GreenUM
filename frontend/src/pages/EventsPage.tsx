@@ -1,34 +1,101 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
 import { Plus, Calendar, Filter } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import EventCard from '../components/EventCard';
-import AddEventModal from '../components/AddEventModal';
+import EventModal from '../components/EventModal';
 
 const EventsPage = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [events, setEvents] = useState<any[]>([]);
-  const { isAdmin } = useAuth(); // Use Auth Context
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<any | null>(null);
+  const { isAdmin } = useAuth();
 
-  // Fetch events from backend
   useEffect(() => {
-    fetch('http://localhost:5000/api/events')
-      .then(res => res.json())
-      .then(data => setEvents(data))
-      .catch(err => console.error('Error fetching events:', err));
+    fetchEvents();
   }, []);
 
-  const handleAddEvent = (newEvent: any) => {
-    // Optimistic update or refetch
-    fetch('http://localhost:5000/api/events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newEvent)
-    })
-      .then(res => res.json())
-      .then(savedEvent => {
-        setEvents([...events, savedEvent]);
-      })
-      .catch(err => console.error('Error adding event:', err));
+  const fetchEvents = async () => {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .order('date', { ascending: true });
+    
+    if (error) {
+      console.error('Error fetching events:', error);
+    } else {
+      setEvents(data || []);
+    }
+  };
+
+  const handleCreateEvent = async (eventData: any) => {
+    const { data, error } = await supabase
+      .from('events')
+      .insert([eventData])
+      .select();
+
+    if (error) {
+      console.error('Error creating event:', error);
+      alert('Failed to create event');
+    } else {
+      setEvents([...events, ...(data || [])]);
+      setIsModalOpen(false);
+    }
+  };
+
+  const handleUpdateEvent = async (eventData: any) => {
+    if (!editingEvent) return;
+
+    const { error } = await supabase
+      .from('events')
+      .update(eventData)
+      .eq('id', editingEvent.id);
+
+    if (error) {
+      console.error('Error updating event:', error);
+      alert('Failed to update event');
+    } else {
+      setEvents(events.map(ev => ev.id === editingEvent.id ? { ...ev, ...eventData } : ev));
+      setIsModalOpen(false);
+      setEditingEvent(null);
+    }
+  };
+
+  const handleDeleteEvent = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this event?')) return;
+
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting event:', error);
+      alert('Failed to delete event');
+    } else {
+      setEvents(events.filter(ev => ev.id !== id));
+    }
+  };
+
+  const openAddModal = () => {
+    setEditingEvent(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (id: string) => {
+    const eventToEdit = events.find(ev => ev.id === id);
+    if (eventToEdit) {
+      setEditingEvent(eventToEdit);
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleModalSubmit = (formData: any) => {
+    if (editingEvent) {
+      handleUpdateEvent(formData);
+    } else {
+      handleCreateEvent(formData);
+    }
   };
 
   return (
@@ -49,7 +116,7 @@ const EventsPage = () => {
           {/* Only show Add Event if admin */}
           {isAdmin && (
             <button 
-              onClick={() => setIsModalOpen(true)}
+              onClick={openAddModal}
               className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 hover:shadow-lg hover:shadow-green-600/20 transition-all"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -59,7 +126,7 @@ const EventsPage = () => {
         </div>
       </div>
 
-      {/* Stats/Info Cards - similar to the "Accounts" row in the image */}
+      {/* Stats/Info Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-5 text-white shadow-lg shadow-green-600/20">
           <div className="flex items-center justify-between mb-4">
@@ -72,7 +139,6 @@ const EventsPage = () => {
           <div className="text-green-100 text-sm">Active Events</div>
         </div>
 
-        {/* Placeholder stats */}
         <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
            <div className="text-sm font-medium text-gray-500 mb-2">Total Participants</div>
            <div className="text-2xl font-bold text-gray-900">1,245</div>
@@ -99,17 +165,20 @@ const EventsPage = () => {
             <EventCard
               key={event.id}
               {...event}
+              onEdit={openEditModal}
+              onDelete={handleDeleteEvent}
             />
           ))
         )}
       </div>
 
-      {/* Modal only accessible if admin (extra safety) */}
+      {/* Modal only accessible if admin */}
       {isAdmin && (
-        <AddEventModal
+        <EventModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onAdd={handleAddEvent}
+          onSubmit={handleModalSubmit}
+          initialData={editingEvent}
         />
       )}
     </div>
