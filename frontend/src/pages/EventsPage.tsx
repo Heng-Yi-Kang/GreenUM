@@ -141,16 +141,16 @@ const EventsPage = () => {
 
         <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
            <div className="text-sm font-medium text-gray-500 mb-2">Total Participants</div>
-           <div className="text-2xl font-bold text-gray-900">1,245</div>
+           <div className="text-2xl font-bold text-gray-900"></div>
            <div className="text-xs text-green-600 mt-1 flex items-center">
-             <span>+12% from last month</span>
+             <span></span>
            </div>
         </div>
 
         <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
            <div className="text-sm font-medium text-gray-500 mb-2">Impact Score</div>
-           <div className="text-2xl font-bold text-gray-900">98.5</div>
-           <div className="text-xs text-green-600 mt-1">Excellent</div>
+           <div className="text-2xl font-bold text-gray-900"></div>
+           <div className="text-xs text-green-600 mt-1"></div>
         </div>
       </div>
 
