@@ -1,94 +1,67 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import { Plus, Calendar, Filter } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import EventCard from '../components/EventCard';
-import EventModal from '../components/EventModal';
+import { useState } from "react";
+import { Plus, Calendar, Filter } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import EventCard from "../components/event/EventCard";
+import EventCardSkeleton from "../components/event/EventCardSkeleton";
+
+import { useEvents, type Event } from "../hooks/useEvents";
+import CreateEventModal from "@/components/event/CreateEventModal";
+import EventDetailsModal from "@/components/event/EventDetailsModal";
 
 const EventsPage = () => {
-  const [events, setEvents] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<any | null>(null);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const { isAdmin } = useAuth();
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
-    const { data, error } = await supabase
-      .from('events')
-      .select('*')
-      .order('date', { ascending: true });
-    
-    if (error) {
-      console.error('Error fetching events:', error);
-    } else {
-      setEvents(data || []);
-    }
-  };
+  // Use custom hook for event operations
+  const { events, loading, error, createEvent, updateEvent } = useEvents();
 
   const handleCreateEvent = async (eventData: any) => {
-    const { data, error } = await supabase
-      .from('events')
-      .insert([eventData])
-      .select();
+    const result = await createEvent(eventData);
 
-    if (error) {
-      console.error('Error creating event:', error);
-      alert('Failed to create event');
-    } else {
-      setEvents([...events, ...(data || [])]);
+    if (result) {
       setIsModalOpen(false);
+    } else {
+      alert("Failed to create event");
     }
   };
 
   const handleUpdateEvent = async (eventData: any) => {
     if (!editingEvent) return;
 
-    const { error } = await supabase
-      .from('events')
-      .update(eventData)
-      .eq('id', editingEvent.id);
+    const success = await updateEvent(editingEvent.id, eventData);
 
-    if (error) {
-      console.error('Error updating event:', error);
-      alert('Failed to update event');
-    } else {
-      setEvents(events.map(ev => ev.id === editingEvent.id ? { ...ev, ...eventData } : ev));
+    if (success) {
       setIsModalOpen(false);
       setEditingEvent(null);
-    }
-  };
-
-  const handleDeleteEvent = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this event?')) return;
-
-    const { error } = await supabase
-      .from('events')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error deleting event:', error);
-      alert('Failed to delete event');
     } else {
-      setEvents(events.filter(ev => ev.id !== id));
+      alert("Failed to update event");
     }
   };
+
+  // const handleDeleteEvent = async (id: string) => {
+  //   if (!window.confirm("Are you sure you want to delete this event?")) return;
+
+  //   const success = await deleteEvent(id);
+
+  //   if (!success) {
+  //     alert("Failed to delete event");
+  //   }
+  // };
 
   const openAddModal = () => {
     setEditingEvent(null);
     setIsModalOpen(true);
   };
 
-  const openEditModal = (id: string) => {
-    const eventToEdit = events.find(ev => ev.id === id);
-    if (eventToEdit) {
-      setEditingEvent(eventToEdit);
-      setIsModalOpen(true);
-    }
-  };
+  // const openEditModal = (id: string) => {
+  //   const eventToEdit = events.find((ev) => ev.id === id);
+  //   if (eventToEdit) {
+  //     setEditingEvent(eventToEdit);
+  //     setIsModalOpen(true);
+  //   }
+  // };
 
   const handleModalSubmit = (formData: any) => {
     if (editingEvent) {
@@ -103,19 +76,23 @@ const EventsPage = () => {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Upcoming Events</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage and participate in sustainable activities</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Upcoming Events
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+            Manage and participate in sustainable activities
+          </p>
         </div>
-        
+
         <div className="flex items-center gap-3">
-          <button className="flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 hover:shadow-sm transition-all">
+          <button className="flex items-center px-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm transition-all">
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </button>
-          
+
           {/* Only show Add Event if admin */}
           {isAdmin && (
-            <button 
+            <button
               onClick={openAddModal}
               className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 hover:shadow-lg hover:shadow-green-600/20 transition-all"
             >
@@ -133,48 +110,108 @@ const EventsPage = () => {
             <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
               <Calendar className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xs font-medium bg-white/20 px-2 py-1 rounded-full text-white">This Month</span>
+            <span className="text-xs font-medium bg-white/20 px-2 py-1 rounded-full text-white">
+              This Month
+            </span>
           </div>
           <div className="text-3xl font-bold mb-1">{events.length}</div>
           <div className="text-green-100 text-sm">Active Events</div>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-           <div className="text-sm font-medium text-gray-500 mb-2">Total Participants</div>
-           <div className="text-2xl font-bold text-gray-900"></div>
-           <div className="text-xs text-green-600 mt-1 flex items-center">
-             <span></span>
-           </div>
+        <div className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm">
+          <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+            Total Participants
+          </div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-gray-100"></div>
+          <div className="text-xs text-green-600 dark:text-green-400 mt-1 flex items-center">
+            <span></span>
+          </div>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-           <div className="text-sm font-medium text-gray-500 mb-2">Impact Score</div>
-           <div className="text-2xl font-bold text-gray-900"></div>
-           <div className="text-xs text-green-600 mt-1"></div>
+        <div className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm">
+          <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+            Impact Score
+          </div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-gray-100"></div>
+          <div className="text-xs text-green-600 dark:text-green-400 mt-1"></div>
         </div>
       </div>
 
       {/* Events Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.length === 0 ? (
-           <div className="col-span-full text-center py-10 text-gray-500">
-             No events found. {isAdmin ? 'Add the first one!' : 'Check back later.'}
-           </div>
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {loading ? (
+          <div className="col-span-full text-center py-10 text-gray-500">
+            Loading events...
+          </div>
+        ) : error ? (
+          <div className="col-span-full text-center py-10 text-red-500">
+            Error: {error}
+          </div>
+        ) : events.length === 0 ? (
+          <div className="col-span-full text-center py-10 text-gray-500">
+            No events found.{" "}
+            {isAdmin ? "Add the first one!" : "Check back later."}
+          </div>
         ) : (
           events.map((event) => (
             <EventCard
               key={event.id}
-              {...event}
+              id={event.id}
+              title={event.title}
+              description={event.description}
+              date={event.date}
+              time={event.time}
+              location={event.location}
+              image_url={event.image_url}
               onEdit={openEditModal}
               onDelete={handleDeleteEvent}
             />
           ))
         )}
+      </div> */}
+      <div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {loading ? (
+            // Show 6 skeleton cards while loading
+            Array.from({ length: 6 }).map((_, index) => (
+              <EventCardSkeleton key={index} />
+            ))
+          ) : error ? (
+            <div className="col-span-full text-center py-10 text-red-500 dark:text-red-400">
+              Error: {error}
+            </div>
+          ) : events.length === 0 ? (
+            <div className="col-span-full text-center py-10 text-gray-500 dark:text-gray-400">
+              No events found.{" "}
+              {isAdmin ? "Add the first one!" : "Check back later."}
+            </div>
+          ) : (
+            events.map((event) => (
+              <EventCard
+                key={event.id}
+                id={event.id}
+                title={event.title}
+                description={event.description}
+                date={event.date}
+                time={event.time}
+                location={event.location}
+                image_url={event.image_url}
+                onClick={() => setSelectedEvent(event)}
+              />
+            ))
+          )}
+        </div>
+
+        <EventDetailsModal
+          event={selectedEvent}
+          open={!!selectedEvent}
+          onOpenChange={() => setSelectedEvent(null)}
+        />
       </div>
 
       {/* Modal only accessible if admin */}
       {isAdmin && (
-        <EventModal
+        <CreateEventModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleModalSubmit}

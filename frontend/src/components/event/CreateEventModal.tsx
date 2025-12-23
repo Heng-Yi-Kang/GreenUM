@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
 
 interface EventModalProps {
   isOpen: boolean;
@@ -9,26 +9,38 @@ interface EventModalProps {
   title?: string;
 }
 
-const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onSubmit, initialData, title }) => {
+const EventModal: React.FC<EventModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  initialData,
+  title,
+}) => {
   const [formData, setFormData] = useState({
-    title: '',
-    date: '',
-    time: '',
-    location: '',
-    description: ''
+    title: "",
+    date: "",
+    time: "",
+    location: "",
+    description: "",
   });
 
   useEffect(() => {
     if (initialData) {
       setFormData({
-        title: initialData.title || '',
-        date: initialData.date || '',
-        time: initialData.time || '',
-        location: initialData.location || '',
-        description: initialData.description || ''
+        title: initialData.title || "",
+        date: initialData.date || "",
+        time: initialData.time || "",
+        location: initialData.location || "",
+        description: initialData.description || "",
       });
     } else {
-      setFormData({ title: '', date: '', time: '', location: '', description: '' });
+      setFormData({
+        title: "",
+        date: "",
+        time: "",
+        location: "",
+        description: "",
+      });
     }
   }, [initialData, isOpen]);
 
@@ -40,24 +52,33 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onSubmit, init
     onClose();
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target as any;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="flex justify-between items-center p-6 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900">{title || (initialData ? 'Edit Event' : 'Add New Event')}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <h2 className="text-xl font-bold text-gray-900">
+            {title || (initialData ? "Edit Event" : "Add New Event")}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Event Title</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Event Title
+            </label>
             <input
               required
               type="text"
@@ -71,7 +92,9 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onSubmit, init
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Date
+              </label>
               <input
                 required
                 type="date"
@@ -82,7 +105,9 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onSubmit, init
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Time
+              </label>
               <input
                 required
                 type="time"
@@ -95,7 +120,9 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onSubmit, init
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Location
+            </label>
             <input
               required
               type="text"
@@ -108,7 +135,9 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onSubmit, init
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
             <textarea
               required
               name="description"
@@ -125,7 +154,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onSubmit, init
               type="submit"
               className="w-full py-2.5 px-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 focus:ring-4 focus:ring-green-100 transition-all shadow-lg shadow-green-600/20"
             >
-              {initialData ? 'Save Changes' : 'Create Event'}
+              {initialData ? "Save Changes" : "Create Event"}
             </button>
           </div>
         </form>
