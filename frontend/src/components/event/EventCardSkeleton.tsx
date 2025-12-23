@@ -3,11 +3,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EventCardSkeleton() {
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden py-0">
       {/* Image skeleton */}
       <Skeleton className="h-48 w-full rounded-b-none" />
 
-      <CardContent className="p-5">
+      <CardContent className="p-5 pt-0">
         {/* Description skeleton */}
         <div className="mb-4 space-y-2">
           <Skeleton className="h-4 w-full" />

@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Calendar, Clock, MapPin } from "lucide-react";
+import { formatTime12Hour } from "@/lib/utils";
 
 interface Event {
   id: string;
@@ -43,7 +44,7 @@ export default function EventDetailsModal({
             alt={event.title}
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-top from-black/80 via-black/40 to-transparent" />
         </div>
         <DialogHeader>
           <DialogTitle className="text-3xl font-bold">
@@ -68,7 +69,9 @@ export default function EventDetailsModal({
             </div>
             <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-2">
               <Clock className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm font-medium">{event.time}</span>
+              <span className="text-sm font-medium">
+                {formatTime12Hour(event.time)}
+              </span>
             </div>
             <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-2">
               <MapPin className="h-5 w-5 text-muted-foreground" />
@@ -82,7 +85,9 @@ export default function EventDetailsModal({
             </p>
           </div>
           <div className="flex gap-3 pt-4">
-            <Button className="flex-1">Register Now</Button>
+            <Button className="flex-1 bg-green-600 hover:bg-green-700">
+              Register Now
+            </Button>
             <Button variant="outline" className="flex-1 bg-transparent">
               Add to Calendar
             </Button>

@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Clock, MapPin } from "lucide-react";
+import { formatTime12Hour } from "@/lib/utils";
 // import { useAuth } from "@/context/AuthContext";
 
 interface EventCardProps {
@@ -63,7 +64,7 @@ EventCardProps) {
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Clock className="h-4 w-4" />
-            <span>{time}</span>
+            <span>{formatTime12Hour(time)}</span>
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <MapPin className="h-4 w-4" />

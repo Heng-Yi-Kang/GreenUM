@@ -1,11 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { X } from "lucide-react";
+
+interface EventFormData {
+  title: string;
+  date: string;
+  time: string;
+  location: string;
+  description: string;
+}
 
 interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (event: any) => void;
-  initialData?: any | null;
+  onSubmit: (event: EventFormData) => void;
+  initialData?: EventFormData | null;
   title?: string;
 }
 
@@ -16,33 +24,15 @@ const EventModal: React.FC<EventModalProps> = ({
   initialData,
   title,
 }) => {
-  const [formData, setFormData] = useState({
-    title: "",
-    date: "",
-    time: "",
-    location: "",
-    description: "",
+  const getInitialFormData = (): EventFormData => ({
+    title: initialData?.title || "",
+    date: initialData?.date || "",
+    time: initialData?.time || "",
+    location: initialData?.location || "",
+    description: initialData?.description || "",
   });
 
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        title: initialData.title || "",
-        date: initialData.date || "",
-        time: initialData.time || "",
-        location: initialData.location || "",
-        description: initialData.description || "",
-      });
-    } else {
-      setFormData({
-        title: "",
-        date: "",
-        time: "",
-        location: "",
-        description: "",
-      });
-    }
-  }, [initialData, isOpen]);
+  const [formData, setFormData] = useState<EventFormData>(getInitialFormData);
 
   if (!isOpen) return null;
 
@@ -55,7 +45,7 @@ const EventModal: React.FC<EventModalProps> = ({
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target as any;
+    const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
