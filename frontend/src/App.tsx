@@ -11,6 +11,7 @@ import { isConfigured } from "./lib/supabaseClient";
 
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./components/theme-provider";
+import { Toaster } from "sonner";
 
 function App() {
   if (!isConfigured) {
@@ -29,6 +30,7 @@ function App() {
           </Layout>
         </Router>
       </AuthProvider>
+      <Toaster position="top-center" richColors />
     </ThemeProvider>
   );
 }

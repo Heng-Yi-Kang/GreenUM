@@ -16,28 +16,30 @@ const EventHeader = ({ createEvent, updateEvent, fetchEvents }: EventHeaderProps
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
 
-  const handleCreateEvent = async (eventData: CreateEventData) => {
+  const handleCreateEvent = async (eventData: CreateEventData): Promise<boolean> => {
     const result = await createEvent(eventData);
 
     if (result) {
-      setIsModalOpen(false);
       await fetchEvents(); // Refetch to sync all components
+      return true;
     } else {
       alert("Failed to create event");
+      return false;
     }
   };
 
-  const handleUpdateEvent = async (eventData: UpdateEventData) => {
-    if (!editingEvent) return;
+  const handleUpdateEvent = async (eventData: UpdateEventData): Promise<boolean> => {
+    if (!editingEvent) return false;
 
     const success = await updateEvent(editingEvent.id, eventData);
 
     if (success) {
-      setIsModalOpen(false);
       setEditingEvent(null);
       await fetchEvents(); // Refetch to sync all components
+      return true;
     } else {
       alert("Failed to update event");
+      return false;
     }
   };
 
@@ -46,11 +48,11 @@ const EventHeader = ({ createEvent, updateEvent, fetchEvents }: EventHeaderProps
     setIsModalOpen(true);
   };
 
-  const handleModalSubmit = (formData: CreateEventData) => {
+  const handleModalSubmit = async (formData: CreateEventData): Promise<boolean> => {
     if (editingEvent) {
-      handleUpdateEvent(formData);
+      return await handleUpdateEvent(formData);
     } else {
-      handleCreateEvent(formData);
+      return await handleCreateEvent(formData);
     }
   };
 

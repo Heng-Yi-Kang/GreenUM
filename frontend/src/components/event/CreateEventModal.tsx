@@ -7,13 +7,14 @@ interface EventFormData {
   time: string;
   location: string;
   description: string;
+  image_url?: string;
   created_by?: string;
 }
 
 interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (event: EventFormData) => void;
+  onSubmit: (event: EventFormData) => Promise<boolean>;
   initialData?: EventFormData | null;
   title?: string;
   userId?: string;
@@ -33,6 +34,7 @@ const EventModal: React.FC<EventModalProps> = ({
     time: initialData?.time || "",
     location: initialData?.location || "",
     description: initialData?.description || "",
+    image_url: initialData?.image_url || "",
   });
 
   const [formData, setFormData] = useState<EventFormData>(getInitialFormData);
@@ -40,7 +42,7 @@ const EventModal: React.FC<EventModalProps> = ({
   // Get today's date in YYYY-MM-DD format
   const today = useMemo(() => {
     const date = new Date();
-    return date.toISOString().split('T')[0];
+    return date.toISOString().split("T")[0];
   }, []);
 
   // Get current time in HH:MM format
@@ -54,15 +56,29 @@ const EventModal: React.FC<EventModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const eventData = { ...formData };
     // Add created_by only for new events (not when editing)
     if (!initialData && userId) {
       eventData.created_by = userId;
     }
-    onSubmit(eventData);
-    onClose();
+
+    const success = await onSubmit(eventData);
+
+    if (success) {
+      // Reset form only on successful submission
+      setFormData({
+        title: "",
+        date: "",
+        time: "",
+        location: "",
+        description: "",
+        image_url: "",
+      });
+      onClose();
+    }
+    // If failed, keep the form data so user can retry
   };
 
   const handleChange = (
@@ -136,6 +152,21 @@ const EventModal: React.FC<EventModalProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Description
+            </label>
+            <textarea
+              required
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              placeholder="Brief description of the event..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Location
             </label>
             <input
@@ -151,16 +182,15 @@ const EventModal: React.FC<EventModalProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Description
+              Image URL (Optional)
             </label>
-            <textarea
-              required
-              name="description"
-              value={formData.description}
+            <input
+              type="url"
+              name="image_url"
+              value={formData.image_url}
               onChange={handleChange}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              placeholder="Brief description of the event..."
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              placeholder="https://example.com/image.jpg"
             />
           </div>
 

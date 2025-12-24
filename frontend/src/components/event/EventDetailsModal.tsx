@@ -1,5 +1,4 @@
-"use client";
-
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +9,9 @@ import {
 } from "@/components/ui/dialog";
 import { Calendar, Clock, MapPin } from "lucide-react";
 import { formatTime12Hour } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
+import { useEventRegistration } from "@/hooks/useEventRegistration";
+import { toast } from "sonner";
 
 interface Event {
   id: string;
@@ -33,7 +35,62 @@ export default function EventDetailsModal({
   open,
   onOpenChange,
 }: EventDetailsModalProps) {
+  const { user, isAdmin } = useAuth();
+  const { isRegistering, registerForEvent, checkUserRegistration } = useEventRegistration();
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [isCheckingRegistration, setIsCheckingRegistration] = useState(false);
+
+  // Check if user is already registered when modal opens
+  useEffect(() => {
+    const checkRegistration = async () => {
+      if (!user || !event || !open) {
+        setIsRegistered(false);
+        return;
+      }
+
+      setIsCheckingRegistration(true);
+      try {
+        const registered = await checkUserRegistration(event.id, user.id);
+        setIsRegistered(registered);
+      } catch (error) {
+        console.error('Error checking registration status:', error);
+        setIsRegistered(false);
+      } finally {
+        setIsCheckingRegistration(false);
+      }
+    };
+
+    checkRegistration();
+  }, [user, event, open, checkUserRegistration]);
+
   if (!event) return null;
+
+  const handleRegister = async () => {
+    if (!user) {
+      toast.error("Please sign in to register for events");
+      return;
+    }
+
+    console.log('User attempting to register:', {
+      userId: user.id,
+      userEmail: user.email,
+      eventId: event.id
+    });
+
+    try {
+      await registerForEvent(event.id, {
+        user_id: user.id,
+        user_email: user.email || "",
+      });
+
+      setIsRegistered(true);
+      toast.success("Successfully registered for the event!");
+    } catch (error) {
+      console.error('Registration failed in component:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to register';
+      toast.error(`Registration failed: ${errorMessage}`);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -85,9 +142,30 @@ export default function EventDetailsModal({
             </p>
           </div>
           <div className="flex gap-3 pt-4">
-            <Button className="flex-1 bg-green-600 hover:bg-green-700">
-              Register Now
-            </Button>
+            {/* Only show Register Now button for regular users (not admins) */}
+            {user && !isAdmin && (
+              <Button
+                onClick={handleRegister}
+                disabled={isRegistering || isRegistered || isCheckingRegistration}
+                className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isCheckingRegistration
+                  ? "Checking..."
+                  : isRegistering
+                  ? "Registering..."
+                  : isRegistered
+                  ? "Registered ✓"
+                  : "Register Now"}
+              </Button>
+            )}
+            {!user && (
+              <Button
+                onClick={() => toast.error("Please sign in to register for events")}
+                className="flex-1 bg-green-600 hover:bg-green-700"
+              >
+                Register Now
+              </Button>
+            )}
             <Button variant="outline" className="flex-1 bg-transparent">
               Add to Calendar
             </Button>
