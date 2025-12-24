@@ -39,12 +39,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                     </span>
                   </div>
 
-                  <Link
-                    to="/going"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-green-400 mr-2 transition-colors"
-                  >
-                    Going
-                  </Link>
+                
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
