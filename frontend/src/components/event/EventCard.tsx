@@ -37,7 +37,7 @@ EventCardProps) {
     >
       <div className="relative h-48 overflow-hidden">
         <img
-          src={image_url || "/placeholder.svg"}
+          src={image_url || "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"}
           alt={title}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />

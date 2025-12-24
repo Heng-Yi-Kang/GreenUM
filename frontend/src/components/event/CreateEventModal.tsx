@@ -1,5 +1,20 @@
+"use client";
+
 import React, { useState, useMemo } from "react";
-import { X } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
+import { TimePicker } from "@/components/ui/time-picker";
 
 interface EventFormData {
   title: string;
@@ -54,8 +69,6 @@ const EventModal: React.FC<EventModalProps> = ({
   // Check if selected date is today
   const isToday = formData.date === today;
 
-  if (!isOpen) return null;
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const eventData = { ...formData };
@@ -89,122 +102,104 @@ const EventModal: React.FC<EventModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>
             {title || (initialData ? "Edit Event" : "Add New Event")}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+          </DialogTitle>
+          <DialogDescription>
+            {initialData
+              ? "Update event details below"
+              : "Fill in the details to create a new event"}
+          </DialogDescription>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Event Title
-            </label>
-            <input
-              required
-              type="text"
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid gap-2">
+            <Label htmlFor="title">Event Title</Label>
+            <Input
+              id="title"
               name="title"
               value={formData.title}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               placeholder="e.g. Community Beach Cleanup"
+              required
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Date
-              </label>
-              <input
-                required
-                type="date"
-                name="date"
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="date">Date</Label>
+              <DatePicker
                 value={formData.date}
-                onChange={handleChange}
-                min={initialData ? undefined : today}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, date: value }))
+                }
+                minDate={initialData ? undefined : new Date()}
+                placeholder="Select date"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Time
-              </label>
-              <input
-                required
-                type="time"
-                name="time"
+            <div className="grid gap-2">
+              <Label htmlFor="time">Time</Label>
+              <TimePicker
                 value={formData.time}
-                onChange={handleChange}
-                min={!initialData && isToday ? currentTime : undefined}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, time: value }))
+                }
+                minTime={!initialData && isToday ? currentTime : undefined}
               />
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Description
-            </label>
-            <textarea
-              required
+          <div className="grid gap-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
               name="description"
               value={formData.description}
               onChange={handleChange}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               placeholder="Brief description of the event..."
+              rows={3}
+              required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Location
-            </label>
-            <input
-              required
-              type="text"
+          <div className="grid gap-2">
+            <Label htmlFor="location">Location</Label>
+            <Input
+              id="location"
               name="location"
               value={formData.location}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               placeholder="e.g. Central Park"
+              required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Image URL (Optional)
-            </label>
-            <input
-              type="url"
+          <div className="grid gap-2">
+            <Label htmlFor="image_url">Image URL (Optional)</Label>
+            <Input
+              id="image_url"
               name="image_url"
+              type="url"
               value={formData.image_url}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               placeholder="https://example.com/image.jpg"
             />
           </div>
 
-          <div className="pt-4">
-            <button
-              type="submit"
-              className="w-full py-2.5 px-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 focus:ring-4 focus:ring-green-100 dark:focus:ring-green-900 transition-all shadow-lg shadow-green-600/20"
-            >
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">
               {initialData ? "Save Changes" : "Create Event"}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
