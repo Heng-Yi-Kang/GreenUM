@@ -124,6 +124,33 @@ export const useEventRegistration = () => {
     [getEventRegistrations]
   );
 
+  // Get all registrations for a user
+  const getUserRegistrations = useCallback(
+    async (userId: string): Promise<any[]> => {
+      setError(null);
+      try {
+        const response = await axiosInstance.get<any[]>(
+          `/users/${userId}/registrations`
+        );
+        return response.data;
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          console.error('Axios error details:', {
+            status: err.response?.status,
+            data: err.response?.data,
+            message: err.message
+          });
+          const errorMessage = err.response?.data?.error || "Failed to fetch user registrations";
+          setError(errorMessage);
+        } else {
+          setError("An unexpected error occurred");
+        }
+        return [];
+      }
+    },
+    []
+  );
+
   return {
     isRegistering,
     isUnregistering,
@@ -132,5 +159,6 @@ export const useEventRegistration = () => {
     unregisterFromEvent,
     getEventRegistrations,
     checkUserRegistration,
+    getUserRegistrations,
   };
 };
