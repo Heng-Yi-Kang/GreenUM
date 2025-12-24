@@ -19,7 +19,7 @@ export function BreadcrumbWithCustomSeparator() {
           <BreadcrumbLink asChild>
             <Link
               to="/"
-              className={location.pathname === "/" ? "text-white" : ""}
+              className={location.pathname === "/" ? "text-foreground font-semibold" : "text-muted-foreground"}
             >
               Home
             </Link>
@@ -32,7 +32,7 @@ export function BreadcrumbWithCustomSeparator() {
           <BreadcrumbLink asChild>
             <Link
               to="/going"
-              className={location.pathname === "/going" ? "text-white" : ""}
+              className={location.pathname === "/going" ? "text-foreground font-semibold" : "text-muted-foreground"}
             >
               Going
             </Link>

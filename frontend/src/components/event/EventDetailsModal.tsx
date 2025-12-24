@@ -92,6 +92,59 @@ export default function EventDetailsModal({
     }
   };
 
+  const handleAddToCalendar = () => {
+    // Format date and time for ICS file
+    const eventDate = new Date(event.date);
+    const [hours, minutes] = event.time.split(':');
+    eventDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+    // Format dates in ICS format (YYYYMMDDTHHMMSS)
+    const formatICSDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hour = String(date.getHours()).padStart(2, '0');
+      const minute = String(date.getMinutes()).padStart(2, '0');
+      const second = String(date.getSeconds()).padStart(2, '0');
+      return `${year}${month}${day}T${hour}${minute}${second}`;
+    };
+
+    // Calculate end time (1 hour after start)
+    const endDate = new Date(eventDate);
+    endDate.setHours(endDate.getHours() + 1);
+
+    // Create ICS content
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//GreenUM//Event Calendar//EN',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      `DTSTART:${formatICSDate(eventDate)}`,
+      `DTEND:${formatICSDate(endDate)}`,
+      `SUMMARY:${event.title}`,
+      `DESCRIPTION:${event.description.replace(/\n/g, '\\n')}`,
+      `LOCATION:${event.location}`,
+      `UID:${event.id}@greenum.org`,
+      `DTSTAMP:${formatICSDate(new Date())}`,
+      'STATUS:CONFIRMED',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    // Create blob and download
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${event.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+
+    toast.success("Calendar event downloaded!");
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -166,7 +219,11 @@ export default function EventDetailsModal({
                 Register Now
               </Button>
             )}
-            <Button variant="outline" className="flex-1 bg-transparent">
+            <Button
+              variant="outline"
+              className="flex-1 bg-transparent"
+              onClick={handleAddToCalendar}
+            >
               Add to Calendar
             </Button>
           </div>
