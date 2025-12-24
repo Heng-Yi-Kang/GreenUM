@@ -9,10 +9,19 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: function (origin, callback) {
+      // Allow any origin during development to avoid CORS issues with localhost/127.0.0.1 mismatch
+      if (!origin || origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:")) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   })
 );
 app.use(express.json());
@@ -47,7 +56,6 @@ app.get("/api/events", async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error("Error fetching events:", err);
-    res.status(500).json({ error: "An error occurred while fetching events." });
     res.status(500).json({ error: err.message });
   }
 });
@@ -79,6 +87,7 @@ app.post("/api/events", async (req, res) => {
 
 // POST /api/events/:eventId/register - Register for an event
 app.post("/api/events/:eventId/register", async (req, res) => {
+  console.log(`[Registration Request] Event: ${req.params.eventId}, Body:`, req.body);
   try {
     const { eventId } = req.params;
     const { user_id, user_email } = req.body;
@@ -185,6 +194,29 @@ app.delete("/api/events/:eventId/register/:userId", async (req, res) => {
     res.json({ message: "Successfully unregistered from event" });
   } catch (err) {
     console.error("Error unregistering from event:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/users/:userId/registrations - Get all events a user is registered for
+app.get("/api/users/:userId/registrations", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Get registrations with event details
+    const { data, error } = await supabase
+      .from("event_registrations")
+      .select(`
+        *,
+        event:events (*)
+      `)
+      .eq("user_id", userId)
+      .order("registered_at", { ascending: false });
+
+    if (error) throw error;
+    res.json(data || []);
+  } catch (err) {
+    console.error("Error fetching user registrations:", err);
     res.status(500).json({ error: err.message });
   }
 });

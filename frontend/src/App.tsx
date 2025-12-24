@@ -6,6 +6,7 @@ import {
 import Layout from "./layout/layout";
 import EventsPage from "./pages/EventsPage";
 import AuthPage from "./pages/AuthPage";
+import GoingPage from "./pages/GoingPage";
 import ConfigErrorPage from "./configs/ConfigErrorPage";
 import { isConfigured } from "./lib/supabaseClient";
 
@@ -26,6 +27,7 @@ function App() {
             <Routes>
               <Route path="/" element={<EventsPage />} />
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/going" element={<GoingPage />} />
             </Routes>
           </Layout>
         </Router>
