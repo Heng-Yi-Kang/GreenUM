@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { Filter, Plus } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { useEvents, type Event, type CreateEventData, type UpdateEventData } from "@/hooks/useEvents";
+import { type Event, type CreateEventData, type UpdateEventData } from "@/hooks/useEvents";
 import CreateEventModal from "@/components/event/CreateEventModal";
 
-const EventHeader = () => {
-  const { isAdmin } = useAuth();
-  const { createEvent, updateEvent, fetchEvents } = useEvents();
+interface EventHeaderProps {
+  createEvent: (eventData: CreateEventData) => Promise<Event | null>;
+  updateEvent: (id: string, eventData: UpdateEventData) => Promise<boolean>;
+  fetchEvents: () => Promise<void>;
+}
+
+const EventHeader = ({ createEvent, updateEvent, fetchEvents }: EventHeaderProps) => {
+  const { isAdmin, user } = useAuth();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
@@ -86,6 +91,7 @@ const EventHeader = () => {
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleModalSubmit}
           initialData={editingEvent}
+          userId={user?.id}
         />
       )}
     </div>

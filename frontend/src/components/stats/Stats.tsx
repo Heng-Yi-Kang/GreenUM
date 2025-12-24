@@ -8,7 +8,7 @@ const Stats = ({ eventsLength }: StatsProps) => {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-5 text-white shadow-lg shadow-green-600/20">
+        <div className="bg-linear-to-br from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 transition-colors duration-300 rounded-xl p-5 text-white shadow-lg shadow-green-600/20">
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
               <Calendar className="w-5 h-5 text-white" />

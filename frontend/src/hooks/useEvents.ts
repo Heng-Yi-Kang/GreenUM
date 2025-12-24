@@ -20,6 +20,7 @@ export interface CreateEventData {
   time: string;
   location: string;
   image_url?: string;
+  created_by?: string;
 }
 
 export type UpdateEventData = Partial<CreateEventData>;

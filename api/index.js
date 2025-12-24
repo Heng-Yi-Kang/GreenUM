@@ -46,8 +46,8 @@ app.get('/api/events', async (req, res) => {
 // POST /api/events - Create new event
 app.post('/api/events', async (req, res) => {
   try {
-    const { title, date, time, location, description } = req.body;
-    
+    const { title, date, time, location, description, created_by } = req.body;
+
     // Basic validation
     if (!title || !date || !location) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -55,7 +55,7 @@ app.post('/api/events', async (req, res) => {
 
     const { data, error } = await supabase
       .from('events')
-      .insert([{ title, date, time, location, description }])
+      .insert([{ title, date, time, location, description, created_by }])
       .select();
 
     if (error) throw error;

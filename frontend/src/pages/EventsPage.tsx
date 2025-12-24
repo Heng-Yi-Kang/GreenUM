@@ -12,12 +12,16 @@ const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   // Use custom hook for event operations
-  const { events, loading, error } = useEvents();
+  const { events, loading, error, createEvent, updateEvent, fetchEvents } = useEvents();
 
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <EventHeader />
+      <EventHeader
+        createEvent={createEvent}
+        updateEvent={updateEvent}
+        fetchEvents={fetchEvents}
+      />
 
       {/* Stats Info Cards */}
       <Stats eventsLength={events.length} />

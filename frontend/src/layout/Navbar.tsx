@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom"
-import { SlashIcon } from "lucide-react"
+import { Link, useLocation } from "react-router-dom";
+import { SlashIcon } from "lucide-react";
 
 import {
   Breadcrumb,
@@ -7,15 +7,22 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+} from "@/components/ui/breadcrumb";
 
 export function BreadcrumbWithCustomSeparator() {
+  const location = useLocation();
+
   return (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link to="/">Home</Link>
+            <Link
+              to="/"
+              className={location.pathname === "/" ? "text-white" : ""}
+            >
+              Home
+            </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator>
@@ -23,10 +30,15 @@ export function BreadcrumbWithCustomSeparator() {
         </BreadcrumbSeparator>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link to="/going">Going</Link>
+            <Link
+              to="/going"
+              className={location.pathname === "/going" ? "text-white" : ""}
+            >
+              Going
+            </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
-  )
+  );
 }

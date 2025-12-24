@@ -2,9 +2,8 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
-import Layout from "./Layouts/layout";
+import Layout from "./layout/layout";
 import EventsPage from "./pages/EventsPage";
 import AuthPage from "./pages/AuthPage";
 import ConfigErrorPage from "./configs/ConfigErrorPage";
@@ -24,8 +23,7 @@ function App() {
         <Router>
           <Layout>
             <Routes>
-              <Route path="/" element={<Navigate to="/events" replace />} />
-              <Route path="/events" element={<EventsPage />} />
+              <Route path="/" element={<EventsPage />} />
               <Route path="/auth" element={<AuthPage />} />
             </Routes>
           </Layout>
