@@ -1,13 +1,20 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const { createClient } = require('@supabase/supabase-js');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:3000"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json());
 
 // Supabase Client
@@ -15,52 +22,169 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.warn('WARNING: Missing SUPABASE_URL or SUPABASE_KEY. DB features will fail.');
+  console.warn(
+    "WARNING: Missing SUPABASE_URL or SUPABASE_KEY. DB features will fail."
+  );
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Routes
-app.get('/', (req, res) => {
-  res.send('GreenUM API is running');
+app.get("/", (req, res) => {
+  res.send("GreenUM API is running");
 });
 
 // Event Routes
 // GET /api/events - List all events
-app.get('/api/events', async (req, res) => {
+app.get("/api/events", async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('events')
-      .select('*')
-      .order('date', { ascending: true });
+      .from("events")
+      .select("*")
+      .order("date", { ascending: true });
 
     if (error) throw error;
     res.json(data);
   } catch (err) {
-    console.error('Error fetching events:', err);
-    res.status(500).json({ error: 'An error occurred while fetching events.' });
+    console.error("Error fetching events:", err);
+    res.status(500).json({ error: "An error occurred while fetching events." });
     res.status(500).json({ error: err.message });
   }
 });
 
 // POST /api/events - Create new event
-app.post('/api/events', async (req, res) => {
+app.post("/api/events", async (req, res) => {
   try {
-    const { title, date, time, location, description } = req.body;
-    
+    const { title, date, time, location, description, image_url, created_by } =
+      req.body;
+
     // Basic validation
     if (!title || !date || !location) {
-      return res.status(400).json({ error: 'Missing required fields' });
+      return res.status(400).json({ error: "Missing required fields" });
     }
 
     const { data, error } = await supabase
-      .from('events')
-      .insert([{ title, date, time, location, description }])
+      .from("events")
+      .insert([
+        { title, date, time, location, description, image_url, created_by },
+      ])
       .select();
 
     if (error) throw error;
     res.status(201).json(data[0]);
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/events/:eventId/register - Register for an event
+app.post("/api/events/:eventId/register", async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { user_id, user_email } = req.body;
+
+    // Basic validation
+    if (!user_id || !user_email) {
+      return res.status(400).json({ error: "Missing user_id or user_email" });
+    }
+
+    console.log(eventId, user_id, user_email);
+
+    // Validate that user is not an admin/event manager
+    if (user_email.endsWith("@greenum.org")) {
+      return res.status(403).json({
+        error:
+          "Event managers and admins cannot register for events. Only regular users can register.",
+      });
+    }
+
+    // Check if event exists
+    const { data: eventData, error: eventError } = await supabase
+      .from("events")
+      .select("id, title")
+      .eq("id", eventId)
+      .single();
+
+    if (eventError || !eventData) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    // Check if user is already registered
+    const { data: existingRegistration, error: checkError } = await supabase
+      .from("event_registrations")
+      .select("id")
+      .eq("event_id", eventId)
+      .eq("user_id", user_id)
+      .maybeSingle();
+
+    if (checkError && checkError.code !== "PGRST116") {
+      throw checkError;
+    }
+
+    if (existingRegistration) {
+      return res.status(409).json({
+        error: "You are already registered for this event",
+      });
+    }
+
+    // Create registration
+    const { data, error } = await supabase
+      .from("event_registrations")
+      .insert([
+        {
+          event_id: eventId,
+          user_id: user_id,
+          user_email: user_email,
+          registered_at: new Date().toISOString(),
+        },
+      ])
+      .select();
+
+    if (error) throw error;
+    res.status(201).json({
+      message: "Successfully registered for event",
+      registration: data[0],
+    });
+  } catch (err) {
+    console.error("Error registering for event:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/events/:eventId/registrations - Get all registrations for an event
+app.get("/api/events/:eventId/registrations", async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    const { data, error } = await supabase
+      .from("event_registrations")
+      .select("*")
+      .eq("event_id", eventId)
+      .order("registered_at", { ascending: false });
+
+    if (error) throw error;
+    res.json(data || []);
+  } catch (err) {
+    console.error("Error fetching registrations:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/events/:eventId/register/:userId - Unregister from an event
+app.delete("/api/events/:eventId/register/:userId", async (req, res) => {
+  try {
+    const { eventId, userId } = req.params;
+
+    const { error } = await supabase
+      .from("event_registrations")
+      .delete()
+      .eq("event_id", eventId)
+      .eq("user_id", userId);
+
+    if (error) throw error;
+    res.json({ message: "Successfully unregistered from event" });
+  } catch (err) {
+    console.error("Error unregistering from event:", err);
     res.status(500).json({ error: err.message });
   }
 });
