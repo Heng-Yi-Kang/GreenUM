@@ -1,5 +1,7 @@
 "use client";
 
+"use client";
+
 import React, { useState, useMemo } from "react";
 import {
   Dialog,
@@ -14,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/date-picker";
+import { TimePicker } from "@/components/ui/time-picker";
 
 interface EventFormData {
   title: string;
@@ -102,10 +105,17 @@ const EventModal: React.FC<EventModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-125">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
             {title || (initialData ? "Edit Event" : "Add New Event")}
+          </DialogTitle>
+          <DialogDescription>
+            {initialData
+              ? "Update event details below"
+              : "Fill in the details to create a new event"}
+          </DialogDescription>
+        </DialogHeader>
           </DialogTitle>
           <DialogDescription>
             {initialData
@@ -119,14 +129,24 @@ const EventModal: React.FC<EventModalProps> = ({
             <Label htmlFor="title">Event Title</Label>
             <Input
               id="title"
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid gap-2">
+            <Label htmlFor="title">Event Title</Label>
+            <Input
+              id="title"
               name="title"
               value={formData.title}
               onChange={handleChange}
               placeholder="e.g. Community Beach Cleanup"
               required
+              required
             />
           </div>
 
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="date">Date</Label>
+              <DatePicker
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="date">Date</Label>
@@ -137,22 +157,29 @@ const EventModal: React.FC<EventModalProps> = ({
                 }
                 minDate={initialData ? undefined : new Date()}
                 placeholder="Select date"
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, date: value }))
+                }
+                minDate={initialData ? undefined : new Date()}
+                placeholder="Select date"
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="time">Time</Label>
-              <Input
-                id="time"
-                name="time"
-                type="time"
+              <TimePicker
                 value={formData.time}
-                onChange={handleChange}
-                min={!initialData && isToday ? currentTime : undefined}
-                required
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, time: value }))
+                }
+                minTime={!initialData && isToday ? currentTime : undefined}
               />
             </div>
           </div>
 
+          <div className="grid gap-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
           <div className="grid gap-2">
             <Label htmlFor="description">Description</Label>
             <Textarea
@@ -163,9 +190,15 @@ const EventModal: React.FC<EventModalProps> = ({
               placeholder="Brief description of the event..."
               rows={3}
               required
+              rows={3}
+              required
             />
           </div>
 
+          <div className="grid gap-2">
+            <Label htmlFor="location">Location</Label>
+            <Input
+              id="location"
           <div className="grid gap-2">
             <Label htmlFor="location">Location</Label>
             <Input
@@ -175,6 +208,7 @@ const EventModal: React.FC<EventModalProps> = ({
               onChange={handleChange}
               placeholder="e.g. Central Park"
               required
+              required
             />
           </div>
 
@@ -182,7 +216,12 @@ const EventModal: React.FC<EventModalProps> = ({
             <Label htmlFor="image_url">Image URL (Optional)</Label>
             <Input
               id="image_url"
+          <div className="grid gap-2">
+            <Label htmlFor="image_url">Image URL (Optional)</Label>
+            <Input
+              id="image_url"
               name="image_url"
+              type="url"
               type="url"
               value={formData.image_url}
               onChange={handleChange}
@@ -195,10 +234,19 @@ const EventModal: React.FC<EventModalProps> = ({
               Cancel
             </Button>
             <Button type="submit">
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">
               {initialData ? "Save Changes" : "Create Event"}
             </Button>
           </DialogFooter>
+            </Button>
+          </DialogFooter>
         </form>
+      </DialogContent>
+    </Dialog>
       </DialogContent>
     </Dialog>
   );

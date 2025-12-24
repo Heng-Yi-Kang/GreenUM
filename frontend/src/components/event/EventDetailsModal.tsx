@@ -264,7 +264,7 @@ export default function EventDetailsModal({
             )}
           </div>
           <div className="flex gap-3">
-            {/* Only show Register Now button for regular users (not admins) */}
+            {/* Only show Register/Unregister button for regular users (not admins) */}
             {user && !isAdmin && (
               <>
                 {isRegistered && showUnregister ? (
@@ -297,9 +297,9 @@ export default function EventDetailsModal({
             )}
             {!user && (
               <Button
-                onClick={() => {
-                  navigate("/auth", { state: { eventId: event.id } });
-                }}
+                onClick={() =>
+                  toast.error("Please sign in to register for events")
+                }
                 className="flex-1 bg-green-600 hover:bg-green-700"
               >
                 Register Now
