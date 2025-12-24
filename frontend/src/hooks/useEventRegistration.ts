@@ -22,33 +22,37 @@ export const useEventRegistration = () => {
 
   // Register for an event
   const registerForEvent = useCallback(
-    async (eventId: string, data: RegisterEventData): Promise<EventRegistration | null> => {
+    async (
+      eventId: string,
+      data: RegisterEventData
+    ): Promise<EventRegistration | null> => {
       setIsRegistering(true);
       setError(null);
 
       try {
-        console.log('Registering for event:', eventId, data);
         const response = await axiosInstance.post<{
           message: string;
           registration: EventRegistration;
         }>(`/events/${eventId}/register`, data);
 
-        console.log('Registration successful:', response.data);
         return response.data.registration;
       } catch (err) {
-        console.error('Registration error:', err);
+        console.error("Registration error:", err);
         if (axios.isAxiosError(err)) {
-          console.error('Axios error details:', {
+          console.error("Axios error details:", {
             status: err.response?.status,
             data: err.response?.data,
-            message: err.message
+            message: err.message,
           });
-          const errorMessage = err.response?.data?.error || err.message || "Failed to register for event";
+          const errorMessage =
+            err.response?.data?.error ||
+            err.message ||
+            "Failed to register for event";
           setError(errorMessage);
           throw new Error(errorMessage);
         }
         const errorMessage = "An unexpected error occurred";
-        console.error('Non-axios error:', err);
+        console.error("Non-axios error:", err);
         setError(errorMessage);
         throw new Error(errorMessage);
       } finally {
@@ -69,7 +73,8 @@ export const useEventRegistration = () => {
         return true;
       } catch (err) {
         if (axios.isAxiosError(err)) {
-          const errorMessage = err.response?.data?.error || "Failed to unregister from event";
+          const errorMessage =
+            err.response?.data?.error || "Failed to unregister from event";
           setError(errorMessage);
         } else {
           setError("An unexpected error occurred");
@@ -94,7 +99,8 @@ export const useEventRegistration = () => {
         return response.data;
       } catch (err) {
         if (axios.isAxiosError(err)) {
-          const errorMessage = err.response?.data?.error || "Failed to fetch registrations";
+          const errorMessage =
+            err.response?.data?.error || "Failed to fetch registrations";
           setError(errorMessage);
         } else {
           setError("An unexpected error occurred");

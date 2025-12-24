@@ -1,12 +1,9 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./layout/layout";
 import EventsPage from "./pages/EventsPage";
 import AuthPage from "./pages/AuthPage";
 import GoingPage from "./pages/GoingPage";
+import ManagerEventsPage from "./pages/ManagerEventsPage";
 import ConfigErrorPage from "./configs/ConfigErrorPage";
 import { isConfigured } from "./lib/supabaseClient";
 
@@ -28,6 +25,7 @@ function App() {
               <Route path="/" element={<EventsPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/going" element={<GoingPage />} />
+              <Route path="/manager/events" element={<ManagerEventsPage />} />
             </Routes>
           </Layout>
         </Router>
