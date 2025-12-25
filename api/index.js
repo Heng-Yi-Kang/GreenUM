@@ -11,7 +11,11 @@ app.use(
   cors({
     origin: function (origin, callback) {
       // Allow any origin during development to avoid CORS issues with localhost/127.0.0.1 mismatch
-      if (!origin || origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:")) {
+      if (
+        !origin ||
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://127.0.0.1:")
+      ) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
@@ -19,7 +23,12 @@ app.use(
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+    ],
     preflightContinue: false,
     optionsSuccessStatus: 204,
   })
@@ -44,13 +53,21 @@ app.get("/", (req, res) => {
 });
 
 // Event Routes
-// GET /api/events - List all events
+// GET /api/events - List all events (for users: only upcoming and ongoing)
 app.get("/api/events", async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("events")
-      .select("*")
-      .order("date", { ascending: true });
+    const { include_completed } = req.query;
+
+    let query = supabase.from("events").select("*");
+
+    // Filter out completed events unless explicitly requested
+    if (include_completed !== "true") {
+      query = query.in("status", ["upcoming", "ongoing"]);
+    }
+
+    query = query.order("date", { ascending: true });
+
+    const { data, error } = await query;
 
     if (error) throw error;
     res.json(data);
@@ -74,7 +91,16 @@ app.post("/api/events", async (req, res) => {
     const { data, error } = await supabase
       .from("events")
       .insert([
-        { title, date, time, location, description, image_url, created_by },
+        {
+          title,
+          date,
+          time,
+          location,
+          description,
+          image_url,
+          created_by,
+          status: "upcoming", // Default status when creating event
+        },
       ])
       .select();
 
@@ -87,7 +113,10 @@ app.post("/api/events", async (req, res) => {
 
 // POST /api/events/:eventId/register - Register for an event
 app.post("/api/events/:eventId/register", async (req, res) => {
-  console.log(`[Registration Request] Event: ${req.params.eventId}, Body:`, req.body);
+  console.log(
+    `[Registration Request] Event: ${req.params.eventId}, Body:`,
+    req.body
+  );
   try {
     const { eventId } = req.params;
     const { user_id, user_email } = req.body;
@@ -96,8 +125,6 @@ app.post("/api/events/:eventId/register", async (req, res) => {
     if (!user_id || !user_email) {
       return res.status(400).json({ error: "Missing user_id or user_email" });
     }
-
-    console.log(eventId, user_id, user_email);
 
     // Validate that user is not an admin/event manager
     if (user_email.endsWith("@greenum.org")) {
@@ -198,6 +225,70 @@ app.delete("/api/events/:eventId/register/:userId", async (req, res) => {
   }
 });
 
+// PUT /api/events/:eventId - Update an event
+app.put("/api/events/:eventId", async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { title, date, time, location, description, image_url, status } =
+      req.body;
+
+    // Basic validation
+    if (!title || !date || !location) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const updateData = {
+      title,
+      date,
+      time,
+      location,
+      description,
+      image_url,
+    };
+
+    // Only include status if provided
+    if (status) {
+      updateData.status = status;
+    }
+
+    const { data, error } = await supabase
+      .from("events")
+      .update(updateData)
+      .eq("id", eventId)
+      .select();
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    res.json(data[0]);
+  } catch (err) {
+    console.error("Error updating event:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/events/:eventId - Delete an event
+app.delete("/api/events/:eventId", async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    // First, delete all registrations for this event
+    await supabase.from("event_registrations").delete().eq("event_id", eventId);
+
+    // Then delete the event
+    const { error } = await supabase.from("events").delete().eq("id", eventId);
+
+    if (error) throw error;
+    res.json({ message: "Event deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting event:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/users/:userId/registrations - Get all events a user is registered for
 app.get("/api/users/:userId/registrations", async (req, res) => {
   try {
@@ -206,10 +297,12 @@ app.get("/api/users/:userId/registrations", async (req, res) => {
     // Get registrations with event details
     const { data, error } = await supabase
       .from("event_registrations")
-      .select(`
+      .select(
+        `
         *,
         event:events (*)
-      `)
+      `
+      )
       .eq("user_id", userId)
       .order("registered_at", { ascending: false });
 

@@ -22,38 +22,79 @@ export function TimePicker({
 }: TimePickerProps) {
   const [hours, setHours] = React.useState<string>("00");
   const [minutes, setMinutes] = React.useState<string>("00");
+  const prevValueRef = React.useRef<string>(value);
 
-  // Initialize from value prop
+  // Initialize from value prop only when it changes externally
   React.useEffect(() => {
-    if (value) {
+    // Only update if value changed from outside (not from our own onChange)
+    if (value && value !== prevValueRef.current) {
       const [h, m] = value.split(":");
       setHours(h || "00");
       setMinutes(m || "00");
+      prevValueRef.current = value;
     }
   }, [value]);
 
-  // Notify parent of changes
-  React.useEffect(() => {
-    const timeString = `${hours}:${minutes}`;
-    if (onChange && timeString !== value) {
-      onChange(timeString);
-    }
-  }, [hours, minutes]);
-
   const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let val = e.target.value.replace(/\D/g, "");
+
+    // Allow empty or partial input
+    if (val === "") {
+      setHours("00");
+      if (onChange) {
+        const newValue = `00:${minutes.padStart(2, "0")}`;
+        prevValueRef.current = newValue;
+        onChange(newValue);
+      }
+      return;
+    }
+
     if (val.length > 2) val = val.slice(0, 2);
-    const num = parseInt(val) || 0;
+    const num = parseInt(val);
     if (num > 23) val = "23";
-    setHours(val.padStart(2, "0"));
+
+    // Don't pad while typing - just use the raw value
+    setHours(val);
+
+    // For onChange callback, pad the value
+    const paddedHours = val.padStart(2, "0");
+    const paddedMinutes = minutes.padStart(2, "0");
+    if (onChange) {
+      const newValue = `${paddedHours}:${paddedMinutes}`;
+      prevValueRef.current = newValue;
+      onChange(newValue);
+    }
   };
 
   const handleMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let val = e.target.value.replace(/\D/g, "");
+
+    // Allow empty or partial input
+    if (val === "") {
+      setMinutes("00");
+      if (onChange) {
+        const newValue = `${hours.padStart(2, "0")}:00`;
+        prevValueRef.current = newValue;
+        onChange(newValue);
+      }
+      return;
+    }
+
     if (val.length > 2) val = val.slice(0, 2);
-    const num = parseInt(val) || 0;
+    const num = parseInt(val);
     if (num > 59) val = "59";
-    setMinutes(val.padStart(2, "0"));
+
+    // Don't pad while typing - just use the raw value
+    setMinutes(val);
+
+    // For onChange callback, pad the value
+    const paddedHours = hours.padStart(2, "0");
+    const paddedMinutes = val.padStart(2, "0");
+    if (onChange) {
+      const newValue = `${paddedHours}:${paddedMinutes}`;
+      prevValueRef.current = newValue;
+      onChange(newValue);
+    }
   };
 
   return (

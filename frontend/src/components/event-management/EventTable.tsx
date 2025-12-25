@@ -21,6 +21,7 @@ import { useEvents } from "@/hooks/useEvents";
 import { useAuth } from "@/context/AuthContext";
 import { useEventRegistration } from "@/hooks/useEventRegistration";
 import { toast } from "sonner";
+import { formatTime12Hour } from "@/lib/utils";
 
 interface Event {
   id: string;
@@ -277,7 +278,7 @@ export function EventsTable() {
                       Date & Time
                     </p>
                     <p className="text-sm font-medium text-foreground">
-                      {event.date} • {event.time}
+                      {event.date} • {formatTime12Hour(event.time)}
                     </p>
                   </div>
                 </div>
@@ -311,18 +312,6 @@ export function EventsTable() {
             </div>
           </Card>
         ))}
-
-        {filteredEvents.length === 0 && (
-          <Card className="p-12 text-center">
-            <Calendar className="mx-auto mb-4 size-12 text-muted-foreground" />
-            <h3 className="mb-2 text-lg font-semibold text-foreground">
-              No events found
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Try adjusting your search or create a new event
-            </p>
-          </Card>
-        )}
       </div>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
