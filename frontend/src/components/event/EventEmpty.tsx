@@ -15,10 +15,8 @@ export function EventsEmpty({
         className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-card p-16 w-full max-w-full h-[50vh]
 "
       >
-        {/* Heart Icon */}
         <TreePine className="w-20 h-20 mb-2" />
 
-        {/* Empty State Message */}
         <div className="mb-2 text-center">
           <h2 className="text-xl font-semibold text-foreground">
             {title || (isAdmin ? "No event created" : "No events yet")}

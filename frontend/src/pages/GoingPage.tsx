@@ -8,6 +8,7 @@ import EventDetailsModal from "@/components/event/EventDetailsModal";
 import { EventsEmpty } from "@/components/event/EventEmpty";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { PromptAuth } from "@/components/prompt/promptAuth";
 
 export default function GoingPage() {
   const { user } = useAuth();
@@ -19,8 +20,7 @@ export default function GoingPage() {
 
   useEffect(() => {
     if (!user) {
-      navigate("/auth");
-      return;
+      return
     }
 
     const fetchRegistrations = async () => {
@@ -40,11 +40,12 @@ export default function GoingPage() {
   }, [user, navigate, getUserRegistrations]);
 
   const handleCardClick = (event: any) => {
-    // Map backend event structure if needed, or pass directly if shape matches
     setSelectedEvent(event);
   };
 
   return (
+    <>
+    {user ? (
     <div className="space-y-8">
       <div className="flex items-center gap-4">
         <Button 
@@ -101,5 +102,9 @@ export default function GoingPage() {
         onOpenChange={() => setSelectedEvent(null)}
       />
     </div>
+    ) : (
+      <PromptAuth />
+    )}
+    </>
   );
 }
