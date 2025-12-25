@@ -54,7 +54,7 @@ export default function GoingPage() {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Your Events</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Your Events</h1>
           <p className="text-muted-foreground mt-1">
             Events you have registered to attend
           </p>
