@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/date-picker";
-import { TimePicker } from "@/components/ui/time-picker";
 
 interface EventFormData {
   title: string;
@@ -105,7 +104,7 @@ const EventModal: React.FC<EventModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle>
             {title || (initialData ? "Edit Event" : "Add New Event")}
@@ -166,12 +165,14 @@ const EventModal: React.FC<EventModalProps> = ({
             </div>
             <div className="grid gap-2">
               <Label htmlFor="time">Time</Label>
-              <TimePicker
+              <Input
+                id="time"
+                name="time"
+                type="time"
                 value={formData.time}
-                onChange={(value) =>
-                  setFormData((prev) => ({ ...prev, time: value }))
-                }
-                minTime={!initialData && isToday ? currentTime : undefined}
+                onChange={handleChange}
+                min={!initialData && isToday ? currentTime : undefined}
+                required
               />
             </div>
           </div>

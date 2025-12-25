@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
-import { TimePicker } from "@/components/ui/time-picker";
 
 interface EventData {
   id: string;
@@ -49,6 +48,11 @@ export function EditEventDialog({
   onSave,
 }: EditEventDialogProps) {
   const [formData, setFormData] = useState<EventData>(event);
+
+  // Update form data when event prop changes
+  React.useEffect(() => {
+    setFormData(event);
+  }, [event]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,11 +106,14 @@ export function EditEventDialog({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="time">Time</Label>
-                <TimePicker
+                <Input
+                  id="time"
+                  type="time"
                   value={formData.time || ""}
-                  onChange={(value) =>
-                    setFormData({ ...formData, time: value })
+                  onChange={(e) =>
+                    setFormData({ ...formData, time: e.target.value })
                   }
+                  required
                 />
               </div>
             </div>
