@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useEventRegistration } from "@/hooks/useEventRegistration";
@@ -18,26 +18,23 @@ export default function GoingPage() {
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
 
-  useEffect(() => {
-    if (!user) {
-      return
+  const fetchRegistrations = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const data = await getUserRegistrations(user.id);
+      console.log("User registrations:", data);
+      setRegistrations(data);
+    } catch (error) {
+      console.error("Failed to fetch registrations:", error);
+    } finally {
+      setLoading(false);
     }
+  }, [user, getUserRegistrations]);
 
-    const fetchRegistrations = async () => {
-      setLoading(true);
-      try {
-        const data = await getUserRegistrations(user.id);
-        console.log("User registrations:", data);
-        setRegistrations(data);
-      } catch (error) {
-        console.error("Failed to fetch registrations:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+  useEffect(() => {
     fetchRegistrations();
-  }, [user, navigate, getUserRegistrations]);
+  }, [fetchRegistrations]);
 
   const handleCardClick = (event: any) => {
     setSelectedEvent(event);
@@ -100,6 +97,8 @@ export default function GoingPage() {
         event={selectedEvent}
         open={!!selectedEvent}
         onOpenChange={() => setSelectedEvent(null)}
+        showUnregister={true}
+        onRegistrationChange={fetchRegistrations}
       />
     </div>
     ) : (
