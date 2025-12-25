@@ -44,6 +44,7 @@ export default function EventDetailsModal({
     isRegistering,
 
     isUnregistering,
+
     registerForEvent,
     unregisterFromEvent,
 
@@ -272,7 +273,7 @@ export default function EventDetailsModal({
                     variant="destructive"
                     className="flex-1"
                   >
-                    {isUnregistering ? "Unregistering..." : "Not going anymore"}
+                    {isUnregistering ? "Unregistering..." : "Unregister"}
                   </Button>
                 ) : (
                   <Button
