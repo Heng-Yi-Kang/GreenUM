@@ -10,8 +10,6 @@ import { EventsEmpty } from "@/components/event/EventEmpty";
 
 const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-
-  // Use custom hook for event operations
   const { events, loading, error, createEvent, updateEvent, fetchEvents } = useEvents();
 
   return (

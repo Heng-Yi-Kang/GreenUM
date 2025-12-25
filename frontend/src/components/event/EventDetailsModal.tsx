@@ -28,15 +28,25 @@ interface EventDetailsModalProps {
   event: Event | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  showUnregister?: boolean;
+  onRegistrationChange?: () => void;
 }
 
 export default function EventDetailsModal({
   event,
   open,
   onOpenChange,
+  showUnregister = false,
+  onRegistrationChange,
 }: EventDetailsModalProps) {
   const { user, isAdmin } = useAuth();
-  const { isRegistering, registerForEvent, checkUserRegistration } = useEventRegistration();
+  const { 
+    isRegistering, 
+    isUnregistering,
+    registerForEvent, 
+    unregisterFromEvent,
+    checkUserRegistration 
+  } = useEventRegistration();
   const [isRegistered, setIsRegistered] = useState(false);
   const [isCheckingRegistration, setIsCheckingRegistration] = useState(false);
 
@@ -71,12 +81,6 @@ export default function EventDetailsModal({
       return;
     }
 
-    console.log('User attempting to register:', {
-      userId: user.id,
-      userEmail: user.email,
-      eventId: event.id
-    });
-
     try {
       await registerForEvent(event.id, {
         user_id: user.id,
@@ -85,10 +89,29 @@ export default function EventDetailsModal({
 
       setIsRegistered(true);
       toast.success("Successfully registered for the event!");
+      onRegistrationChange?.();
     } catch (error) {
       console.error('Registration failed in component:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to register';
       toast.error(`Registration failed: ${errorMessage}`);
+    }
+  };
+
+  const handleUnregister = async () => {
+    if (!user || !event) return;
+
+    try {
+      const success = await unregisterFromEvent(event.id, user.id);
+      if (success) {
+        setIsRegistered(false);
+        toast.success("Successfully unregistered from the event");
+        onRegistrationChange?.();
+      } else {
+        toast.error("Failed to unregister from the event");
+      }
+    } catch (error) {
+      console.error('Unregistration failed:', error);
+      toast.error("An error occurred during unregistration");
     }
   };
 
@@ -195,21 +218,34 @@ export default function EventDetailsModal({
             </p>
           </div>
           <div className="flex gap-3 pt-4">
-            {/* Only show Register Now button for regular users (not admins) */}
+            {/* Only show Register/Unregister button for regular users (not admins) */}
             {user && !isAdmin && (
-              <Button
-                onClick={handleRegister}
-                disabled={isRegistering || isRegistered || isCheckingRegistration}
-                className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isCheckingRegistration
-                  ? "Checking..."
-                  : isRegistering
-                  ? "Registering..."
-                  : isRegistered
-                  ? "Registered ✓"
-                  : "Register Now"}
-              </Button>
+              <>
+                {isRegistered && showUnregister ? (
+                  <Button
+                    onClick={handleUnregister}
+                    disabled={isUnregistering}
+                    variant="destructive"
+                    className="flex-1"
+                  >
+                    {isUnregistering ? "Unregistering..." : "Unregister"}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleRegister}
+                    disabled={isRegistering || isRegistered || isCheckingRegistration}
+                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isCheckingRegistration
+                      ? "Checking..."
+                      : isRegistering
+                      ? "Registering..."
+                      : isRegistered
+                      ? "Registered ✓"
+                      : "Register Now"}
+                  </Button>
+                )}
+              </>
             )}
             {!user && (
               <Button
