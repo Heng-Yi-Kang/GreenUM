@@ -25,6 +25,11 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "jsx": "react-jsx",
+    /* Disable declaration file generation */
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
+    "noEmit": true,
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
