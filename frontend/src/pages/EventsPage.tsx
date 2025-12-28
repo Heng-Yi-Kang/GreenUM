@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import EventCard from "../components/event/EventCard";
 import EventCardSkeleton from "../components/event/EventCardSkeleton";
 
@@ -10,9 +11,25 @@ import { EventsEmpty } from "@/components/event/EventEmpty";
 
 const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Use custom hook for event operations
-  const { events, loading, error, createEvent, updateEvent, fetchEvents } = useEvents();
+  const { events, loading, error, createEvent, updateEvent, fetchEvents } =
+    useEvents();
+
+  // Check if we're redirected from auth with an event ID to open
+  useEffect(() => {
+    const eventId = (location.state as { eventId?: string })?.eventId;
+    if (eventId && events.length > 0) {
+      const event = events.find((e) => e.id === eventId);
+      if (event) {
+        setSelectedEvent(event);
+        // Clear the state to prevent reopening on refresh
+        navigate(location.pathname, { replace: true });
+      }
+    }
+  }, [location.state, events, navigate, location.pathname]);
 
   return (
     <div className="space-y-6">

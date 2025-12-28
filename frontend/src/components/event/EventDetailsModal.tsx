@@ -12,6 +12,7 @@ import { formatTime12Hour } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { useEventRegistration } from "@/hooks/useEventRegistration";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface Event {
   id: string;
@@ -36,6 +37,7 @@ export default function EventDetailsModal({
   onOpenChange,
 }: EventDetailsModalProps) {
   const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const {
     isRegistering,
     registerForEvent,
@@ -255,9 +257,9 @@ export default function EventDetailsModal({
             )}
             {!user && (
               <Button
-                onClick={() =>
-                  toast.error("Please sign in to register for events")
-                }
+                onClick={() => {
+                  navigate("/auth", { state: { eventId: event.id } });
+                }}
                 className="flex-1 bg-green-600 hover:bg-green-700"
               >
                 Register Now

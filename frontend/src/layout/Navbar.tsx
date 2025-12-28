@@ -20,10 +20,14 @@ export function BreadcrumbWithCustomSeparator() {
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
             <Link
-              to="/"
-              className={location.pathname === "/" ? "text-foreground font-semibold" : "text-muted-foreground"}
+              to="/events"
+              className={
+                location.pathname === "/events"
+                  ? "text-foreground font-semibold"
+                  : "text-muted-foreground"
+              }
             >
-              Home
+              Events
             </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
@@ -35,8 +39,12 @@ export function BreadcrumbWithCustomSeparator() {
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link
-                to="/manager/events"
-                className={location.pathname === "/manager/events" ? "text-foreground font-semibold" : "text-muted-foreground"}
+                to="/events/manager/events"
+                className={
+                  location.pathname === "/events/manager/events"
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground"
+                }
               >
                 My Events
               </Link>
@@ -46,8 +54,12 @@ export function BreadcrumbWithCustomSeparator() {
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link
-                to="/going"
-                className={location.pathname === "/going" ? "text-foreground font-semibold" : "text-muted-foreground"}
+                to="/events/going"
+                className={
+                  location.pathname === "/events/going"
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground"
+                }
               >
                 Going
               </Link>

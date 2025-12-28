@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Mail, Lock, AlertCircle, ArrowRight, TreePine } from "lucide-react";
 
 const AuthPage: React.FC = () => {
@@ -12,6 +12,8 @@ const AuthPage: React.FC = () => {
 
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const eventId = (location.state as { eventId?: string })?.eventId;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +27,12 @@ const AuthPage: React.FC = () => {
 
       if (authError) throw authError;
 
-      navigate("/");
+      // If we have an event ID, redirect back to events with that ID
+      if (eventId) {
+        navigate("/events", { state: { eventId } });
+      } else {
+        navigate("/events");
+      }
     } catch (err: any) {
       setError(err.message || "An error occurred during authentication");
     } finally {
