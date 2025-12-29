@@ -1,18 +1,21 @@
-import axios from 'axios';
-import { supabase } from './supabaseClient';
+import axios from "axios";
+import { supabase } from "./supabaseClient";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
+  baseURL: "/api",
   timeout: 10000,
+  withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 // Request interceptor to add auth token
 axiosInstance.interceptors.request.use(
   async (config) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
     if (session?.access_token) {
       config.headers.Authorization = `Bearer ${session.access_token}`;
@@ -37,23 +40,23 @@ axiosInstance.interceptors.response.use(
 
       if (status === 401) {
         // Unauthorized - could redirect to login
-        console.error('Unauthorized access');
+        console.error("Unauthorized access");
       } else if (status === 403) {
         // Forbidden
-        console.error('Forbidden access');
+        console.error("Forbidden access");
       } else if (status === 404) {
         // Not found
-        console.error('Resource not found');
+        console.error("Resource not found");
       } else if (status >= 500) {
         // Server error
-        console.error('Server error:', data.message || 'Something went wrong');
+        console.error("Server error:", data.message || "Something went wrong");
       }
     } else if (error.request) {
       // Request made but no response
-      console.error('Network error - no response received');
+      console.error("Network error - no response received");
     } else {
       // Something else happened
-      console.error('Request error:', error.message);
+      console.error("Request error:", error.message);
     }
 
     return Promise.reject(error);
