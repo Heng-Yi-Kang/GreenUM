@@ -133,7 +133,10 @@ export function EditEventDialog({
               <Select
                 value={formData.status || "upcoming"}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, status: value as "upcoming" | "ongoing" | "completed" })
+                  setFormData({
+                    ...formData,
+                    status: value as "upcoming" | "ongoing" | "completed",
+                  })
                 }
               >
                 <SelectTrigger id="status">

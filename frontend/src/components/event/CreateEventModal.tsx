@@ -114,6 +114,12 @@ const EventModal: React.FC<EventModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
+        <DialogDescription>
+          {initialData
+            ? "Update event details below"
+            : "Fill in the details to create a new event"}
+        </DialogDescription>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-2">
             <Label htmlFor="title">Event Title</Label>
