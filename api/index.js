@@ -9,7 +9,18 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: function (origin, callback) {
+      // Allow any origin during development to avoid CORS issues with localhost/127.0.0.1 mismatch
+      if (
+        !origin ||
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://127.0.0.1:")
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -40,9 +51,7 @@ app.get("/api/events", async (req, res) => {
   try {
     const { include_completed } = req.query;
 
-    let query = supabase
-      .from("events")
-      .select("*");
+    let query = supabase.from("events").select("*");
 
     // Filter out completed events unless explicitly requested
     if (include_completed !== "true") {
@@ -72,7 +81,7 @@ app.post("/api/events", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const { data, error} = await supabase
+    const { data, error } = await supabase
       .from("events")
       .insert([
         {
@@ -83,7 +92,7 @@ app.post("/api/events", async (req, res) => {
           description,
           image_url,
           created_by,
-          status: "upcoming" // Default status when creating event
+          status: "upcoming", // Default status when creating event
         },
       ])
       .select();
@@ -209,7 +218,8 @@ app.delete("/api/events/:eventId/register/:userId", async (req, res) => {
 app.put("/api/events/:eventId", async (req, res) => {
   try {
     const { eventId } = req.params;
-    const { title, date, time, location, description, image_url, status } = req.body;
+    const { title, date, time, location, description, image_url, status } =
+      req.body;
 
     // Basic validation
     if (!title || !date || !location) {
@@ -255,16 +265,10 @@ app.delete("/api/events/:eventId", async (req, res) => {
     const { eventId } = req.params;
 
     // First, delete all registrations for this event
-    await supabase
-      .from("event_registrations")
-      .delete()
-      .eq("event_id", eventId);
+    await supabase.from("event_registrations").delete().eq("event_id", eventId);
 
     // Then delete the event
-    const { error } = await supabase
-      .from("events")
-      .delete()
-      .eq("id", eventId);
+    const { error } = await supabase.from("events").delete().eq("id", eventId);
 
     if (error) throw error;
     res.json({ message: "Event deleted successfully" });

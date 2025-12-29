@@ -42,22 +42,27 @@ export const useEvents = () => {
         ? "/api/events?include_completed=true"
         : "/api/events";
 
-      const response = await fetch(url);
+      const response = await fetch(url, { credentials: "include" });
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Failed to fetch events" }));
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Failed to fetch events" }));
         throw new Error(errorData.error || "Failed to fetch events");
       }
 
       const data = await response.json();
       setEvents(data || []);
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Failed to fetch events";
+      const errorMsg =
+        err instanceof Error ? err.message : "Failed to fetch events";
       setError(errorMsg);
       console.error("Error fetching events:", errorMsg);
 
       // Show helpful message if it's a database schema error
       if (errorMsg.includes("does not exist") || errorMsg.includes("column")) {
-        console.error("⚠️ Database migration needed! Run the SQL in RUN-THIS-FIRST.md");
+        console.error(
+          "⚠️ Database migration needed! Run the SQL in RUN-THIS-FIRST.md"
+        );
       }
     } finally {
       setLoading(false);
@@ -104,6 +109,7 @@ export const useEvents = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(eventData),
+          credentials: "include",
         });
 
         if (!response.ok) throw new Error("Failed to update event");
@@ -133,6 +139,7 @@ export const useEvents = () => {
     try {
       const response = await fetch(`/api/events/${id}`, {
         method: "DELETE",
+        credentials: "include",
       });
 
       if (!response.ok) throw new Error("Failed to delete event");
