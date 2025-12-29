@@ -273,7 +273,9 @@ export default function EventDetailsModal({
                     variant="destructive"
                     className="flex-1"
                   >
-                    {isUnregistering ? "Unregistering..." : "Unregister"}
+                    {isUnregistering
+                      ? "Unregistering..."
+                      : "Opps I'm not going anymore"}
                   </Button>
                 ) : (
                   <Button
