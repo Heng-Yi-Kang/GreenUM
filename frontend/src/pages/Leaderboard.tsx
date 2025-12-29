@@ -1,6 +1,6 @@
-import { leaderboardData } from "@/components/leaderboard/LeaderBoardData";
-import { LeaderboardFooter } from "@/components/leaderboard/LeaderBoardFooter";
-import { LeaderboardHeader } from "@/components/leaderboard/LeaderBoardHeader";
+import { leaderboardData } from "@/components/leaderboard/LeaderboardData";
+import { LeaderboardFooter } from "@/components/leaderboard/LeaderboardFooter";
+import { LeaderboardHeader } from "@/components/leaderboard/LeaderboardHeader";
 import { RankingsDivider } from "@/components/leaderboard/RankingDivider";
 import { RemainingRankings } from "@/components/leaderboard/RemainingRankings";
 import { TopThreePodium } from "@/components/leaderboard/TopThreePodium";
