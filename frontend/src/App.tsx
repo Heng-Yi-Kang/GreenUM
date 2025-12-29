@@ -26,7 +26,7 @@ function App() {
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/going" element={<GoingPage />} />
               <Route path="/manager/events" element={<ManagerEventsPage />} />
-              <Route path="/going" element={<GoingPage />} />
+              
             </Routes>
           </Layout>
         </Router>
