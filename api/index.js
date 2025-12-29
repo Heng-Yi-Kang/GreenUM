@@ -113,6 +113,10 @@ app.post("/api/events", async (req, res) => {
 
 // POST /api/events/:eventId/register - Register for an event
 app.post("/api/events/:eventId/register", async (req, res) => {
+  console.log(
+    `[Registration Request] Event: ${req.params.eventId}, Body:`,
+    req.body
+  );
   try {
     const { eventId } = req.params;
     const { user_id, user_email } = req.body;
@@ -281,6 +285,31 @@ app.delete("/api/events/:eventId", async (req, res) => {
     res.json({ message: "Event deleted successfully" });
   } catch (err) {
     console.error("Error deleting event:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/users/:userId/registrations - Get all events a user is registered for
+app.get("/api/users/:userId/registrations", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Get registrations with event details
+    const { data, error } = await supabase
+      .from("event_registrations")
+      .select(
+        `
+        *,
+        event:events (*)
+      `
+      )
+      .eq("user_id", userId)
+      .order("registered_at", { ascending: false });
+
+    if (error) throw error;
+    res.json(data || []);
+  } catch (err) {
+    console.error("Error fetching user registrations:", err);
     res.status(500).json({ error: err.message });
   }
 });

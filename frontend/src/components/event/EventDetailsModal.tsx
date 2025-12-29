@@ -28,17 +28,26 @@ interface EventDetailsModalProps {
   event: Event | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  showUnregister?: boolean;
+  onRegistrationChange?: () => void;
 }
 
 export default function EventDetailsModal({
   event,
   open,
   onOpenChange,
+  showUnregister = false,
+  onRegistrationChange,
 }: EventDetailsModalProps) {
   const { user, isAdmin } = useAuth();
   const {
     isRegistering,
+
+    isUnregistering,
+
     registerForEvent,
+    unregisterFromEvent,
+
     checkUserRegistration,
     getEventRegistrations,
   } = useEventRegistration();
@@ -100,11 +109,30 @@ export default function EventDetailsModal({
       setIsRegistered(true);
       setAttendeeCount((prev) => prev + 1);
       toast.success("Successfully registered for the event!");
+      onRegistrationChange?.();
     } catch (error) {
       console.error("Registration failed in component:", error);
       const errorMessage =
         error instanceof Error ? error.message : "Failed to register";
       toast.error(`Registration failed: ${errorMessage}`);
+    }
+  };
+
+  const handleUnregister = async () => {
+    if (!user || !event) return;
+
+    try {
+      const success = await unregisterFromEvent(event.id, user.id);
+      if (success) {
+        setIsRegistered(false);
+        toast.success("Successfully unregistered from the event");
+        onRegistrationChange?.();
+      } else {
+        toast.error("Failed to unregister from the event");
+      }
+    } catch (error) {
+      console.error("Unregistration failed:", error);
+      toast.error("An error occurred during unregistration");
     }
   };
 
@@ -235,23 +263,38 @@ export default function EventDetailsModal({
             )}
           </div>
           <div className="flex gap-3">
-            {/* Only show Register Now button for regular users (not admins) */}
+            {/* Only show Register/Unregister button for regular users (not admins) */}
             {user && !isAdmin && (
-              <Button
-                onClick={handleRegister}
-                disabled={
-                  isRegistering || isRegistered || isCheckingRegistration
-                }
-                className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isCheckingRegistration
-                  ? "Checking..."
-                  : isRegistering
-                  ? "Registering..."
-                  : isRegistered
-                  ? "Registered ✓"
-                  : "Register Now"}
-              </Button>
+              <>
+                {isRegistered && showUnregister ? (
+                  <Button
+                    onClick={handleUnregister}
+                    disabled={isUnregistering}
+                    variant="destructive"
+                    className="flex-1"
+                  >
+                    {isUnregistering
+                      ? "Unregistering..."
+                      : "Opps I'm not going anymore"}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleRegister}
+                    disabled={
+                      isRegistering || isRegistered || isCheckingRegistration
+                    }
+                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isCheckingRegistration
+                      ? "Checking..."
+                      : isRegistering
+                      ? "Registering..."
+                      : isRegistered
+                      ? "Registered ✓"
+                      : "Register Now"}
+                  </Button>
+                )}
+              </>
             )}
             {!user && (
               <Button

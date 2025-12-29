@@ -38,6 +38,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                       {isAdmin ? "Administrator" : "Community Member"}
                     </span>
                   </div>
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button className="bg-green-100 dark:bg-green-900 p-2 rounded-lg text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800 transition-all">

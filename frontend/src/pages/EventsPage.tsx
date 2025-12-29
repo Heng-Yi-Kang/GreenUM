@@ -10,8 +10,6 @@ import { EventsEmpty } from "@/components/event/EventEmpty";
 
 const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-
-  // Use custom hook for event operations
   const { events, loading, error, createEvent, updateEvent, fetchEvents } = useEvents();
 
   return (
@@ -30,7 +28,6 @@ const EventsPage = () => {
       <div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {loading ? (
-            // Show 6 skeleton cards while loading
             Array.from({ length: 6 }).map((_, index) => (
               <EventCardSkeleton key={index} />
             ))
