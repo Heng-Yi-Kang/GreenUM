@@ -3,6 +3,7 @@ import Layout from "./layout/layout";
 import HomePage from "./pages/HomePage";
 import EventsPage from "./pages/EventsPage";
 import AuthPage from "./pages/AuthPage";
+import GoingPage from "./pages/GoingPage";
 import ManagerEventsPage from "./pages/ManagerEventsPage";
 import LeaderboardPage from "./pages/Leaderboard";
 import GoingPage from "./pages/GoingPage";
