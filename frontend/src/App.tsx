@@ -7,7 +7,6 @@ import ManagerEventsPage from "./pages/ManagerEventsPage";
 import LeaderboardPage from "./pages/Leaderboard";
 import GoingPage from "./pages/GoingPage";
 import ManagerEventsPage from "./pages/ManagerEventsPage";
-import GoingPage from "./pages/GoingPage";
 import ConfigErrorPage from "./configs/ConfigErrorPage";
 import { isConfigured } from "./lib/supabaseClient";
 import { SiteHeader } from "./components/shared/Header";
