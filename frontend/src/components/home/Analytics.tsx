@@ -1,38 +1,60 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, Activity, Users, TrendingUp } from "lucide-react";
+import { useStats } from "@/hooks/useStats";
 
-const stats = [
-  {
-    title: "Active Events",
-    value: "24",
-    change: "+12% from last month",
-    icon: Activity,
-    trend: "up",
-  },
-  {
-    title: "Total Participants",
-    value: "1,234",
-    change: "+18% from last month",
-    icon: Users,
-    trend: "up",
-  },
-  {
-    title: "Impact Score",
-    value: "45.2K",
-    change: "+25% from last month",
-    icon: TrendingUp,
-    trend: "up",
-  },
-  {
-    title: "CO₂ Reduced",
-    value: "2.5T",
-    change: "+8% from last month",
-    icon: BarChart3,
-    trend: "up",
-  },
-];
+// Helper function to format large numbers
+const formatNumber = (num: number): string => {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M`;
+  } else if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}K`;
+  }
+  return num.toString();
+};
 
 export function Analytics() {
+  const { stats, loading } = useStats();
+
+  // Create dynamic stats array based on fetched data
+  const displayStats = [
+    {
+      title: "Active Events",
+      value: loading ? "..." : stats.activeEvents.toString(),
+      change: "Upcoming & Ongoing",
+      icon: Activity,
+      trend: "up" as const,
+    },
+    {
+      title: "Total Participants",
+      value: loading
+        ? "..."
+        : stats.totalUsers > 0
+        ? formatNumber(stats.totalUsers)
+        : "0",
+      change: "Registered Users",
+      icon: Users,
+      trend: "up" as const,
+    },
+    {
+      title: "Impact Score",
+      value: loading
+        ? "..."
+        : stats.impactScore > 0
+        ? formatNumber(stats.impactScore)
+        : "0",
+      change: "Estimated based on engagement",
+      icon: TrendingUp,
+      trend: "up" as const,
+    },
+    {
+      title: "CO₂ Reduced",
+      value: loading ? "..." : `${stats.co2Reduced}T`,
+      change: "Estimated from events",
+      icon: BarChart3,
+      trend: "up" as const,
+    },
+  ];
+
   return (
     <section className="py-20 md:py-32">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -52,9 +74,9 @@ export function Analytics() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, index) => (
+          {displayStats.map((stat, index) => (
             <Card key={index} className="border-2">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   {stat.title}
                 </CardTitle>
@@ -62,8 +84,7 @@ export function Analytics() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold mb-1">{stat.value}</div>
-                <p className="text-sm text-green-600 flex items-center gap-1">
-                  <TrendingUp className="h-3 w-3" />
+                <p className="text-sm text-muted-foreground flex items-center gap-1">
                   {stat.change}
                 </p>
               </CardContent>

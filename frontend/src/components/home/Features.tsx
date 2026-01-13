@@ -23,8 +23,8 @@ const features = [
     title: "Analytics Dashboard",
     description:
       "Track active events, monitor participation metrics, and measure your community impact in real-time.",
-    color: "text-teal-700",
-    bgColor: "bg-teal-100",
+    color: "text-emerald-700",
+    bgColor: "bg-emerald-100",
   },
 ];
 

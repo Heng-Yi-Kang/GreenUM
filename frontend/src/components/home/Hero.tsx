@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Leaf } from "lucide-react";
+import { useStats } from "@/hooks/useStats";
+import { Link } from "react-router-dom";
 
 export function Hero() {
+  const { stats, loading } = useStats();
+
   return (
     <section className="relative overflow-hidden bg-background py-20 md:py-32">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -24,40 +28,57 @@ export function Hero() {
             </p>
 
             <div className="flex flex-col gap-4 sm:flex-row">
-              <Button
-                size="lg"
-                className="text-base bg-green-700 hover:bg-green-800 text-white"
-              >
-                Get Started <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-base bg-transparent"
-              >
-                Learn More
-              </Button>
+              <Link to="/auth">
+                <Button
+                  size="lg"
+                  className="text-base bg-green-700 hover:bg-green-800 text-white"
+                >
+                  Get Started <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+
+              <Link to="/about-us">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="text-base bg-transparent"
+                >
+                  About us
+                </Button>
+              </Link>
             </div>
 
             <div className="flex items-center gap-8 pt-4">
               <div>
-                <div className="text-3xl font-bold text-foreground">500+</div>
+                <div className="text-3xl font-bold text-foreground">
+                  {loading
+                    ? "..."
+                    : stats.totalUsers > 0
+                    ? `${stats.totalUsers}+`
+                    : "0"}
+                </div>
                 <div className="text-sm text-muted-foreground">
                   Active Members
                 </div>
               </div>
               <div className="h-12 w-px bg-border" />
               <div>
-                <div className="text-3xl font-bold text-foreground">150+</div>
+                <div className="text-3xl font-bold text-foreground">
+                  {loading
+                    ? "..."
+                    : stats.totalEvents > 0
+                    ? `${stats.totalEvents}+`
+                    : "0"}
+                </div>
                 <div className="text-sm text-muted-foreground">
                   Events Hosted
                 </div>
               </div>
-              <div className="h-12 w-px bg-border" />
+              {/* <div className="h-12 w-px bg-border" />
               <div>
                 <div className="text-3xl font-bold text-foreground">2.5T</div>
                 <div className="text-sm text-muted-foreground">CO₂ Reduced</div>
-              </div>
+              </div> */}
             </div>
           </div>
 

@@ -315,6 +315,62 @@ app.get("/api/users/:userId/registrations", async (req, res) => {
   }
 });
 
+// GET /api/stats - Get platform statistics (total users and events)
+app.get("/api/stats", async (req, res) => {
+  try {
+    // Get total number of events
+    const { count: eventsCount, error: eventsError } = await supabase
+      .from("events")
+      .select("*", { count: "exact", head: true });
+
+    if (eventsError) throw eventsError;
+
+    // Get active events count (upcoming and ongoing)
+    const { count: activeEventsCount, error: activeEventsError } =
+      await supabase
+        .from("events")
+        .select("*", { count: "exact", head: true })
+        .in("status", ["upcoming", "ongoing"]);
+
+    if (activeEventsError) throw activeEventsError;
+
+    // Get total number of authenticated users from Supabase Auth
+    const {
+      data: { users },
+      error: usersError,
+    } = await supabase.auth.admin.listUsers();
+
+    if (usersError) throw usersError;
+
+    const usersCount = users?.length || 0;
+
+    // Get event registrations for CO2 calculation
+    const { data: registrationsData, error: registrationsError } =
+      await supabase.from("event_registrations").select("user_id");
+
+    if (registrationsError) throw registrationsError;
+
+    // Calculate estimated values
+    // Impact Score: Based on users * events * 100 (arbitrary multiplier for visualization)
+    const impactScore = usersCount * (eventsCount || 0) * 100;
+
+    // CO₂ Reduced: Estimate ~20kg CO₂ saved per event participant
+    // Formula: total registrations * 20kg / 1000 = tonnes
+    const co2Reduced = ((registrationsData?.length || 0) * 20) / 1000;
+
+    res.json({
+      totalUsers: usersCount,
+      totalEvents: eventsCount || 0,
+      activeEvents: activeEventsCount || 0,
+      impactScore: impactScore,
+      co2Reduced: co2Reduced.toFixed(1), // Return as string with 1 decimal
+    });
+  } catch (err) {
+    console.error("Error fetching stats:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Start Server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
