@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Users, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const upcomingEvents = [
   {
@@ -114,9 +115,11 @@ export function EventManagement() {
                         {event.attendees}/{event.maxAttendees} attending
                       </span>
                     </div>
-                    <Button className="w-full mt-4 bg-green-700 hover:bg-green-800 text-white">
-                      Register Now
-                    </Button>
+                    <Link to="/events">
+                      <Button className="w-full mt-4 bg-green-700 hover:bg-green-800 text-white">
+                        Register Now
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
