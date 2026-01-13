@@ -77,10 +77,10 @@ export function Footer() {
               <li>Kuala Lumpur, Malaysia</li>
               <li>
                 <a
-                  href="mailto:hello@greenum.edu"
+                  href="mailto:hello@greenum.org"
                   className="hover:text-foreground transition-colors"
                 >
-                  hello@greenum.edu
+                  hello@greenum.org
                 </a>
               </li>
             </ul>

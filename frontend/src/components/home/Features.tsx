@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, Users, BarChart3, Trophy, Zap } from "lucide-react";
+import { Calendar, Users, BarChart3 } from "lucide-react";
 
 const features = [
   {
@@ -25,22 +25,6 @@ const features = [
       "Track active events, monitor participation metrics, and measure your community impact in real-time.",
     color: "text-teal-700",
     bgColor: "bg-teal-100",
-  },
-  {
-    icon: Trophy,
-    title: "Impact Scoring",
-    description:
-      "Earn points for your sustainable actions and see your environmental impact grow over time.",
-    color: "text-green-700",
-    bgColor: "bg-green-100",
-  },
-  {
-    icon: Zap,
-    title: "Real-time Updates",
-    description:
-      "Stay informed with instant notifications about new events, achievements, and community milestones.",
-    color: "text-emerald-700",
-    bgColor: "bg-emerald-100",
   },
 ];
 

@@ -49,13 +49,7 @@ export function SiteHeader() {
               Events
             </Link>
             <Link
-              to="/leaderboard"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Leaderboard
-            </Link>
-            <Link
-              to="/about"
+              to="/about-us"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               About
@@ -99,7 +93,10 @@ export function SiteHeader() {
                 <Button variant="ghost" asChild>
                   <Link to="/auth">Login</Link>
                 </Button>
-                <Button asChild className="gap-2 bg-green-800 text-white">
+                <Button
+                  asChild
+                  className="gap-2 bg-green-700 hover:bg-green-800 text-white"
+                >
                   <Link to="/auth">
                     Sign Up
                     <Leaf className="h-4 w-4" />
@@ -143,14 +140,7 @@ export function SiteHeader() {
                 Events
               </Link>
               <Link
-                to="/leaderboard"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Leaderboard
-              </Link>
-              <Link
-                to="/about"
+                to="/about-us"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >

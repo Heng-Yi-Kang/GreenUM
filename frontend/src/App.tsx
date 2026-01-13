@@ -4,8 +4,8 @@ import HomePage from "./pages/HomePage";
 import EventsPage from "./pages/EventsPage";
 import AuthPage from "./pages/AuthPage";
 import ManagerEventsPage from "./pages/ManagerEventsPage";
-import LeaderboardPage from "./pages/Leaderboard";
 import GoingPage from "./pages/GoingPage";
+import AboutUsPage from "./pages/AboutUsPage";
 import ConfigErrorPage from "./configs/ConfigErrorPage";
 import { isConfigured } from "./lib/supabaseClient";
 import { SiteHeader } from "./components/shared/Header";
@@ -27,7 +27,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/auth" element={<AuthPage />} />
-            <Route path="/leaderboard" element={<LeaderboardPage />} />
+            <Route path="/about-us" element={<AboutUsPage />} />
             <Route
               path="/events/*"
               element={

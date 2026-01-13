@@ -7,7 +7,7 @@ export function Hero() {
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
           <div className="flex flex-col gap-6">
-            <div className="inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-2 text-sm font-medium text-accent-foreground w-fit">
+            <div className="inline-flex items-center gap-2 rounded-full bg-green-50 dark:bg-green-800 px-4 py-2 text-sm font-medium text-accent-foreground w-fit">
               <Leaf className="h-4 w-4" />
               <span>University of Malaya Sustainability Platform</span>
             </div>

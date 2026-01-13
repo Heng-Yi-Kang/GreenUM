@@ -23,7 +23,6 @@ export default function GoingPage() {
     setLoading(true);
     try {
       const data = await getUserRegistrations(user.id);
-      console.log("User registrations:", data);
       setRegistrations(data);
     } catch (error) {
       console.error("Failed to fetch registrations:", error);
