@@ -1,141 +1,96 @@
 import { Leaf } from "lucide-react";
-import { Link } from "react-router-dom";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-muted/30">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-8 md:grid-cols-4">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Leaf className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold text-foreground">GreenUM</span>
+    <footer className="py-12 bg-background border-t">
+      <div className="container mx-auto px-4">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                <Leaf className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <span className="text-xl font-bold">GreenUM</span>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Building a sustainable future for University Malata, one action at
-              a time.
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Building a sustainable future for University of Malaya, one event
+              at a time.
             </p>
           </div>
 
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Features</h3>
+            <h4 className="font-semibold mb-4">Platform</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link
-                  to="#"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Recycling Guides
-                </Link>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  Events
+                </a>
               </li>
               <li>
-                <Link
-                  to="#"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Leaderboards
-                </Link>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  Community
+                </a>
               </li>
               <li>
-                <Link
-                  to="#"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Rewards
-                </Link>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  Leaderboard
+                </a>
               </li>
               <li>
-                <Link
-                  to="#"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Real-Time Data
-                </Link>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  Dashboard
+                </a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Resources</h3>
+            <h4 className="font-semibold mb-4">Resources</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link
-                  to="#"
-                  className="hover:text-foreground transition-colors"
-                >
-                  About SDG 12
-                </Link>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  About Us
+                </a>
               </li>
               <li>
-                <Link
-                  to="#"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Sustainability Tips
-                </Link>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  Blog
+                </a>
               </li>
               <li>
-                <Link
-                  to="#"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Campus Partners
-                </Link>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  Guidelines
+                </a>
               </li>
               <li>
-                <Link
-                  to="#"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Contact Us
-                </Link>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  Support
+                </a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Connect</h3>
+            <h4 className="font-semibold mb-4">Contact</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>University of Malaya</li>
+              <li>Kuala Lumpur, Malaysia</li>
               <li>
-                <Link
-                  to="#"
+                <a
+                  href="mailto:hello@greenum.org"
                   className="hover:text-foreground transition-colors"
                 >
-                  Instagram
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="#"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Twitter
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="#"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Facebook
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="#"
-                  className="hover:text-foreground transition-colors"
-                >
-                  LinkedIn
-                </Link>
+                  hello@greenum.org
+                </a>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border text-center text-sm text-muted-foreground">
+        <div className="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">
           <p>
-            © 2025 GreenUM - University Malata. Supporting UN Sustainable
-            Development Goal 12.
+            &copy; 2026 GreenUM. All rights reserved. University of Malaya
+            Sustainability Initiative.
           </p>
         </div>
       </div>

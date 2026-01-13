@@ -43,14 +43,14 @@
   /* Green color palette */
   --color-green-50: oklch(0.98 0.02 155);
   --color-green-100: oklch(0.95 0.05 155);
-  --color-green-200: oklch(0.90 0.10 155);
-  --color-green-300: oklch(0.80 0.13 155);
+  --color-green-200: oklch(0.9 0.1 155);
+  --color-green-300: oklch(0.8 0.13 155);
   --color-green-400: oklch(0.75 0.15 155);
   --color-green-500: oklch(0.65 0.15 155);
   --color-green-600: oklch(0.55 0.15 155);
   --color-green-700: oklch(0.45 0.15 155);
   --color-green-800: oklch(0.35 0.12 155);
-  --color-green-900: oklch(0.25 0.10 155);
+  --color-green-900: oklch(0.25 0.1 155);
   --color-green-950: oklch(0.15 0.05 155);
 }
 
