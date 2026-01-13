@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import EventCard from "../components/event/EventCard";
 import EventCardSkeleton from "../components/event/EventCardSkeleton";
@@ -13,6 +13,7 @@ const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const hasProcessedEventRef = useRef(false);
 
   // Use custom hook for event operations
   const { events, loading, error, createEvent, updateEvent, fetchEvents } =
@@ -21,13 +22,24 @@ const EventsPage = () => {
   // Check if we're redirected from auth with an event ID to open
   useEffect(() => {
     const eventId = (location.state as { eventId?: string })?.eventId;
-    if (eventId && events.length > 0) {
+
+    // Only process if we haven't already processed this event
+    if (eventId && events.length > 0 && !hasProcessedEventRef.current) {
       const event = events.find((e) => e.id === eventId);
       if (event) {
-        setSelectedEvent(event);
-        // Clear the state to prevent reopening on refresh
-        navigate(location.pathname, { replace: true });
+        hasProcessedEventRef.current = true;
+
+        // Schedule state updates in a microtask to avoid cascading renders
+        queueMicrotask(() => {
+          setSelectedEvent(event);
+          navigate(location.pathname, { replace: true, state: {} });
+        });
       }
+    }
+
+    // Reset the ref when eventId is cleared
+    if (!eventId && hasProcessedEventRef.current) {
+      hasProcessedEventRef.current = false;
     }
   }, [location.state, events, navigate, location.pathname]);
 
