@@ -1,18 +1,22 @@
-import { CTASection } from "@/components/home/CtaSection";
-import { FeaturesGrid } from "@/components/home/FeaturesGrid";
+import { Analytics } from "@/components/home/Analytics";
+import { Community } from "@/components/home/Community";
+import { CTA } from "@/components/home/CTA";
+import { EventManagement } from "@/components/home/EventManagement";
+import { Features } from "@/components/home/Features";
 import { Footer } from "@/components/home/Footer";
-import { HeroSection } from "@/components/home/HeroSection";
-import { StatsSection } from "@/components/home/StatsSection";
+import { Hero } from "@/components/home/Hero";
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <HeroSection />
-      <FeaturesGrid />
-      <StatsSection />
-      <CTASection />
+    <main className="min-h-screen">
+      <Hero />
+      <Features />
+      <EventManagement />
+      <Community />
+      <Analytics />
+      <CTA />
       <Footer />
-    </div>
+    </main>
   );
 };
 

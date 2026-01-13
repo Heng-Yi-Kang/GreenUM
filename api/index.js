@@ -4,7 +4,7 @@ const cors = require("cors");
 const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8000;
 
 // Middleware
 app.use(
@@ -14,6 +14,7 @@ app.use(
       if (
         !origin ||
         origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://localhost:5173/") ||
         origin.startsWith("http://127.0.0.1:")
       ) {
         callback(null, true);
